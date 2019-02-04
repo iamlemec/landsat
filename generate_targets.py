@@ -1,0 +1,37 @@
+import argparse
+import pandas as pd
+
+# china 2002
+# python3 generate_targets.py --index=meta/google_landsat_index.csv --output=targets/google_scenes_2002.csv --lat_min=15 --lat_max=55 --lon_min=70 --lon_max=135 --date_min="2002-01-01" --date_max="2002-12-31"
+
+parser = argparse.ArgumentParser(description='Generate list of scenes matching certain criterion.')
+parser.add_argument('--index', type=str, help='path to full index')
+parser.add_argument('--output', type=str, help='path to output to')
+parser.add_argument('--lat_min', type=int, help='minimal WRS path to use')
+parser.add_argument('--lat_max', type=int, help='maximal WRS path to use')
+parser.add_argument('--lon_min', type=int, help='minimal WRS row to use')
+parser.add_argument('--lon_max', type=int, help='maximal WRS row to use')
+parser.add_argument('--date_min', type=str, help='minimal date to use')
+parser.add_argument('--date_max', type=str, help='maximal date to use')
+parser.add_argument('--spacecraft', type=str, default='LANDSAT_7', help='spacecraft to use')
+args = parser.parse_args()
+
+print('loading full index')
+index = pd.read_csv(args.index)
+
+print('selecting on spacecraft')
+index = index.query(f'SPACECRAFT_ID == "{args.spacecraft}"')
+
+print('selecting on location')
+index = index.query(f'NORTH_LAT >= {args.lat_min} and SOUTH_LAT <= {args.lat_max} and EAST_LON >= {args.lon_min} and WEST_LON <= {args.lon_max}')
+
+print('selecting on date')
+index['DATE_ACQUIRED'] = pd.to_datetime(index['DATE_ACQUIRED'])
+index = index.query(f'DATE_ACQUIRED >= "{args.date_min}" and DATE_ACQUIRED <= "{args.date_max}"')
+
+print('finding most recent match')
+index = index.loc[index.groupby(['WRS_PATH', 'WRS_ROW'])['DATE_ACQUIRED'].idxmax()]
+
+print('saving to file')
+index.to_csv(args.output, index=False)
+
