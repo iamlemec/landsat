@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from pyproj import Proj
+from coord_transform import bd2wgs, gcj2wgs
 
 def find_scene(lon, lat, index, best=True):
     if type(index) is str:
@@ -40,7 +41,16 @@ def load_scene(pid, chan='B8'):
     image = Image.open(f'scenes/{pid}_{chan}.TIF')
     return meta, image
 
-def extract_tile(lon, lat, meta, image, rad=256):
+def extract_tile(lon, lat, meta, image, rad=512, proj='bd-09'):
+    if proj == 'bd-09':
+        lon, lat = bd2wgs(lon, lat)
+    elif proj == 'gcj':
+        lon, lat = gcj2wgs(lon, lat)
+    elif prof == 'wgs':
+        pass
+    else:
+        raise('Unknown projection')
+
     utm_zone = meta['UTM_ZONE']
     utm_hemi = 'north' if lat >= 0 else 'south'
     utm_proj = Proj(f'+proj=utm +zone={utm_zone}, +{utm_hemi} +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
@@ -56,9 +66,26 @@ def extract_tile(lon, lat, meta, image, rad=256):
 
     return tile
 
-def extract_tile_once(lon, lat, index, chan='B8', rad=256):
+def extract_tile_once(lon, lat, index, chan='B8', rad=512, proj='bd-09'):
     pid = find_scene(lon, lat, index)
     meta, image = load_scene(pid, chan=chan)
-    tile = extract_tile(lon, lat, meta, image, rad=rad)
+    tile = extract_tile(lon, lat, meta, image, rad=rad, proj=proj)
     return tile
+
+# data is a (fname, lon, lat) list
+def extract_tile_batch(data, index, chan='B8', rad=512, proj='bd-09'):
+    if type(index) is str:
+        index = pd.read_csv(index)
+
+    prods = [(fn, lon, lat, find_scene(lon, lat, index)) for fn, lon, lat in data]
+    prods = pd.DataFrame(prods, columns=['fname', 'lon', 'lat', 'prod'])
+    pmap = prods.groupby('prod').groups
+    print(len(pmap))
+
+    for pid in pmap:
+        meta, image = load_scene(pid, chan=chan)
+        for idx in pmap[pid]:
+            fn, lon, lat = prods.loc[idx][['fname', 'lon', 'lat']]
+            tile = extract_tile(lon, lat, meta, image, rad=rad, proj=proj)
+            tile.save(fn)
 
