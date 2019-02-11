@@ -1,13 +1,32 @@
+import os
 import numpy as np
 import pandas as pd
 from PIL import Image
 from pyproj import Proj
 from coord_transform import bd2wgs, gcj2wgs
+import mectools.hyper as hy
+
+def ensure_wgs(lon, lat, proj):
+    if proj == 'bd-09':
+        return bd2wgs(lon, lat)
+    elif proj == 'gcj':
+        return gcj2wgs(lon, lat)
+    elif proj == 'wgs':
+        return lon, lat
+    else:
+        raise('Unknown projection')
 
 def find_scene(lon, lat, index, best=True):
     if type(index) is str:
         index = pd.read_csv(index)
-    prods = index.query(f'NORTH_LAT >= {lat} and SOUTH_LAT <= {lat} and EAST_LON >= {lon} and WEST_LON <= {lon}')
+    prods = index[
+        (index['NORTH_LAT'] >= lat) &
+        (index['SOUTH_LAT'] <= lat) &
+        (index['EAST_LON' ] >= lon) &
+        (index['WEST_LON' ] <= lon)
+    ]
+    if len(prods) == 0:
+        return None
     if best:
         c_lon = 0.5*(prods['WEST_LON']+prods['EAST_LON'])
         c_lat = 0.5*(prods['NORTH_LAT']+prods['SOUTH_LAT'])
@@ -41,16 +60,8 @@ def load_scene(pid, chan='B8'):
     image = Image.open(f'scenes/{pid}_{chan}.TIF')
     return meta, image
 
-def extract_tile(lon, lat, meta, image, rad=512, proj='bd-09'):
-    if proj == 'bd-09':
-        lon, lat = bd2wgs(lon, lat)
-    elif proj == 'gcj':
-        lon, lat = gcj2wgs(lon, lat)
-    elif prof == 'wgs':
-        pass
-    else:
-        raise('Unknown projection')
-
+# assumes WGS84 datum
+def extract_tile(lon, lat, meta, image, rad=512):
     utm_zone = meta['UTM_ZONE']
     utm_hemi = 'north' if lat >= 0 else 'south'
     utm_proj = Proj(f'+proj=utm +zone={utm_zone}, +{utm_hemi} +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
@@ -66,26 +77,45 @@ def extract_tile(lon, lat, meta, image, rad=512, proj='bd-09'):
 
     return tile
 
-def extract_tile_once(lon, lat, index, chan='B8', rad=512, proj='bd-09'):
+def extract_tile_once(lon, lat, index, rad, size=None, proj='bd-09', resample=Image.LANCZOS):
+    lon, lat = ensure_wgs(lon, lat, proj)
     pid = find_scene(lon, lat, index)
     meta, image = load_scene(pid, chan=chan)
-    tile = extract_tile(lon, lat, meta, image, rad=rad, proj=proj)
+    tile = extract_tile(lon, lat, meta, image, rad=rad)
+    if size is not None:
+        tile = tile.resize((size, size), resample=resample)
     return tile
 
-# data is a (fname, lon, lat) list
-def extract_tile_batch(data, index, chan='B8', rad=512, proj='bd-09'):
+# find scenes corresponding. data is (tag, lon, lat) list
+def index_firm_scenes(data, fout, index, chan='B8', proj='bd-09'):
     if type(index) is str:
         index = pd.read_csv(index)
+    data1 = [(tag, *ensure_wgs(lon, lat, proj=proj)) for tag, lon, lat in data]
+    prods = [(tag, lon, lat, find_scene(lon, lat, index)) for tag, lon, lat in hy.progress(data1, per=100_000)]
+    prods = pd.DataFrame(prods, columns=['tag', 'lon', 'lat', 'prod'])
+    prods.to_csv(fout, index=False)
 
-    prods = [(fn, lon, lat, find_scene(lon, lat, index)) for fn, lon, lat in data]
-    prods = pd.DataFrame(prods, columns=['fname', 'lon', 'lat', 'prod'])
+# scenes is a (tag, lon, lat, prod) file. assumes WGS84 datum
+def extract_firm_tiles(fin, rad, size=256, resample=Image.LANCZOS, chan='B8', loc='tiles', ext='jpg'):
+    prods = pd.read_csv(fin)
+    prods = prods.sort_values(by=['prod', 'tag'])
     pmap = prods.groupby('prod').groups
     print(len(pmap))
 
     for pid in pmap:
+        print(pid)
         meta, image = load_scene(pid, chan=chan)
         for idx in pmap[pid]:
-            fn, lon, lat = prods.loc[idx][['fname', 'lon', 'lat']]
-            tile = extract_tile(lon, lat, meta, image, rad=rad, proj=proj)
-            tile.save(fn)
+            tag, lon, lat = prods.loc[idx][['tag', 'lon', 'lat']]
+            for r in rad:
+                fname = f'{loc}/{tag}_r{r}_s{size}.{ext}'
+                if not os.path.exists(fname):
+                    tile = extract_tile(lon, lat, meta, image, rad=r)
+                    tile = tile.resize((size, size), resample=resample)
+                    tile.save(fname)
 
+# indexing
+# census = pd.read_csv('/home/doug/data/china_firms_plus/census/census_all.csv')
+# census = census[['id', 'longitude', 'latitude']].dropna()
+# firm_data = [(fid, lon, lat) for _, fid, lon, lat in census.itertuples()]
+# location_tools.index_firm_scenes(firm_data, fout='targets/census_firms_2007.csv', index='targets/google_scenes_2007_summer.csv')
