@@ -25,7 +25,12 @@ print('selecting on spacecraft')
 index = index.query(f'SPACECRAFT_ID == "{args.spacecraft}"')
 
 print('selecting on location')
-index = index.query(f'NORTH_LAT >= {args.lat_min} and SOUTH_LAT <= {args.lat_max} and EAST_LON >= {args.lon_min} and WEST_LON <= {args.lon_max}')
+index = index[
+    (index['NORTH_LAT'] >= args.lat_min) &
+    (index['SOUTH_LAT'] <= args.lat_max) &
+    (index['EAST_LON' ] >= args.lon_min) &
+    (index['WEST_LON' ] <= args.lon_max)
+]
 
 print('selecting on date')
 index['DATE_ACQUIRED'] = pd.to_datetime(index['DATE_ACQUIRED'])
@@ -39,4 +44,3 @@ index = index.loc[index.groupby(['WRS_PATH', 'WRS_ROW'])['DATE_ACQUIRED'].idxmax
 
 print('saving to file')
 index.to_csv(args.output, index=False)
-

@@ -77,7 +77,7 @@ def extract_tile(lon, lat, meta, image, rad=512):
 
     return tile
 
-def extract_tile_once(lon, lat, index, rad, size=None, proj='bd-09', resample=Image.LANCZOS):
+def extract_tile_once(lon, lat, index, rad, size=None, proj='bd-09', chan='B8', resample=Image.LANCZOS):
     lon, lat = ensure_wgs(lon, lat, proj)
     pid = find_scene(lon, lat, index)
     meta, image = load_scene(pid, chan=chan)
