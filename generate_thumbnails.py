@@ -1,8 +1,7 @@
 #!/bin/env python3
 
 import os
-import sys
-import time
+import glob
 import argparse
 from PIL import Image
 
@@ -18,17 +17,15 @@ Image.MAX_IMAGE_PIXELS = 1000000000
 size = (args.size, args.size)
 
 thumb_list = []
-for fn in os.listdir(args.input):
-    fbase, _ = os.path.splitext(fn)
-    spath = os.path.join(args.input, fn)
+for fn in glob.glob(f'{args .input}/*.TIF'):
+    dpath, fname = os.path.split(fn)
+    fbase, _ = os.path.splitext(fname)
     tpath = os.path.join(args.output, f'{fbase}.{args.format}')
-
     if args.overwrite or not os.path.isfile(tpath):
-        thumb_list.append((spath, tpath))
+        thumb_list.append((fn, tpath))
 
 for spath, tpath in sorted(thumb_list, key=lambda x: x[0]):
     print(f'Converting: {spath} -> {tpath}')
     im = Image.open(spath)
     thumb = im.resize(size)
     thumb.save(tpath)
-

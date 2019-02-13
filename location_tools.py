@@ -87,17 +87,20 @@ def extract_tile_once(lon, lat, index, rad, size=None, proj='bd-09', chan='B8', 
     return tile
 
 # find scenes corresponding. data is (tag, lon, lat) list
-def index_firm_scenes(data, fout, index, chan='B8', proj='bd-09'):
+def index_firm_scenes(firms, fout, index, chan='B8', proj='bd-09'):
+    if type(firms) is str:
+        firms = pd.read_csv(firms)
     if type(index) is str:
         index = pd.read_csv(index)
-    data1 = [(tag, *ensure_wgs(lon, lat, proj=proj)) for tag, lon, lat in data]
-    prods = [(tag, lon, lat, find_scene(lon, lat, index)) for tag, lon, lat in hy.progress(data1, per=100_000)]
+    firms = [(tag, *ensure_wgs(lon, lat, proj=proj)) for tag, lon, lat in firms[['tag', 'lon', 'lat']].values]
+    prods = [(tag, lon, lat, find_scene(lon, lat, index)) for tag, lon, lat in hy.progress(firms, per=100_000)]
     prods = pd.DataFrame(prods, columns=['tag', 'lon', 'lat', 'prod'])
     prods.to_csv(fout, index=False)
 
 # scenes is a (tag, lon, lat, prod) file. assumes WGS84 datum
-def extract_firm_tiles(fin, rad, size=256, resample=Image.LANCZOS, chan='B8', loc='tiles', ext='jpg'):
-    prods = pd.read_csv(fin)
+def extract_firm_tiles(prods, rad, size=256, resample=Image.LANCZOS, chan='B8', loc='tiles', ext='jpg'):
+    if type(prods) is str:
+        prods = pd.read_csv(fin)
     prods = prods.sort_values(by=['prod', 'tag'])
     pmap = prods.groupby('prod').groups
     print(len(pmap))
@@ -115,9 +118,14 @@ def extract_firm_tiles(fin, rad, size=256, resample=Image.LANCZOS, chan='B8', lo
                     tile.save(fname)
 
 # indexing
-# fname = '../cluster/census/census_2004_geocode.csv'
-# cols = ['No', 'longitude', 'latitude']
-# census = pd.read_csv(fname, usecols=cols).rename(columns={'No': 'id'})
-# census = census[['id', 'longitude', 'latitude']].dropna()
-# firm_data = [(fid, lon, lat) for _, fid, lon, lat in census.itertuples()]
-# location_tools.index_firm_scenes(firm_data, fout='targets/census_firms_2004.csv', index='targets/google_scenes_2002_summer.csv')
+# fname_scenes = 'targets/google_scenes_2002_summer.csv'
+# fname_census = '../cluster/census/census_2004_geocode.csv'
+# fname_target = 'targets/census_firms_2004.csv'
+# cols = {
+#     'No': 'tag',
+#     'longitude': 'lon',
+#     'latitude': 'lat'
+# }
+# census = pd.read_csv(fname_census, usecols=coldefs).rename(columns=coldefs).dropna()
+# location_tools.index_firm_scenes(census, fout=fname_target, index=fname_scenes)
+# location_tools.extract_firm_tiles(fname_target, [512, 1024])
