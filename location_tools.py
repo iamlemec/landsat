@@ -115,7 +115,9 @@ def extract_firm_tiles(fin, rad, size=256, resample=Image.LANCZOS, chan='B8', lo
                     tile.save(fname)
 
 # indexing
-# census = pd.read_csv('/home/doug/data/china_firms_plus/census/census_all.csv')
+# fname = '../cluster/census/census_2004_geocode.csv'
+# cols = ['No', 'longitude', 'latitude']
+# census = pd.read_csv(fname, usecols=cols).rename(columns={'No': 'id'})
 # census = census[['id', 'longitude', 'latitude']].dropna()
 # firm_data = [(fid, lon, lat) for _, fid, lon, lat in census.itertuples()]
-# location_tools.index_firm_scenes(firm_data, fout='targets/census_firms_2007.csv', index='targets/google_scenes_2007_summer.csv')
+# location_tools.index_firm_scenes(firm_data, fout='targets/census_firms_2004.csv', index='targets/google_scenes_2002_summer.csv')
