@@ -20,7 +20,7 @@ thumb_list = []
 for fn in glob.glob(f'{args .input}/*.TIF'):
     dpath, fname = os.path.split(fn)
     fbase, _ = os.path.splitext(fname)
-    tpath = os.path.join(args.output, f'{fbase}.{args.format}')
+    tpath = f'{args.output}/{fbase}.{args.format}'
     if args.overwrite or not os.path.isfile(tpath):
         thumb_list.append((fn, tpath))
 

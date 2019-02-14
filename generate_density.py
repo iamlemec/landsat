@@ -67,8 +67,7 @@ utm_proj = {z: Proj(f'+proj=utm +zone={z}, +ellps=WGS84 +datum=WGS84 +units=m +n
 print(utm_zones)
 
 # save utm cell info
-utm_cells = utm_cent.loc[utm_zones, ['utm_west', 'utm_east', 'utm_north', 'utm_south', 'N']]
-utm_cells.to_csv(f'{args.dense}/utm_cells.csv')
+utm_cent.loc[utm_zones].to_csv(f'{args.dense}/utm_cells.csv')
 
 # group by utm zone and compute histograms
 dense = {}
@@ -99,26 +98,26 @@ for zone, idx in groups.items():
     dense[zone] = sp.csr_matrix((hist['density'], (hist['pix_north'], hist['pix_east'])), shape=(N, N))
 
 # extract firm tiles
-for i, info in progress(firms.iterrows(), per=100_000):
-    fid = info['id']
-    zone = info['utm_zone']
-    hist = dense[zone]
-    proj = utm_proj[zone]
-    cent = utm_cent.loc[zone]
-
-    x, y = proj(info['lon_wgs84'], info['lat_wgs84'])
-    fx = (x-cent['utm_west'])/(cent['utm_east']-cent['utm_west'])
-    fy = (y-cent['utm_south'])/(cent['utm_north']-cent['utm_south'])
-    px, py = int(fx*N), int(fy*N)
-
-    tile = hist[px-rad:px+rad, py-rad:py+rad].toarray()
-    tile = tile/4 # to get most of the action in [0, 255]
-
-    # flat = tile.flatten()
-    # posi = flat[flat>0]
-    # if len(posi) > 0:
-    #     print(fid, np.mean(posi), np.max(posi), np.quantile(posi, [0.01, 0.99]))
-
-    tile = np.clip(tile, 0, 255).astype(np.uint8)
-    im = Image.fromarray(tile)
-    im.save(f'{args.tile}/{fid}.png')
+# for i, info in progress(firms.iterrows(), per=100_000):
+#     fid = info['id']
+#     zone = info['utm_zone']
+#     hist = dense[zone]
+#     proj = utm_proj[zone]
+#     cent = utm_cent.loc[zone]
+#
+#     x, y = proj(info['lon_wgs84'], info['lat_wgs84'])
+#     fx = (x-cent['utm_west'])/(cent['utm_east']-cent['utm_west'])
+#     fy = (y-cent['utm_south'])/(cent['utm_north']-cent['utm_south'])
+#     px, py = int(fx*N), int(fy*N)
+#
+#     tile = hist[px-rad:px+rad, py-rad:py+rad].toarray()
+#     tile = tile/4 # to get most of the action in [0, 255]
+#
+#     # flat = tile.flatten()
+#     # posi = flat[flat>0]
+#     # if len(posi) > 0:
+#     #     print(fid, np.mean(posi), np.max(posi), np.quantile(posi, [0.01, 0.99]))
+#
+#     tile = np.clip(tile, 0, 255).astype(np.uint8)
+#     im = Image.fromarray(tile)
+#     im.save(f'{args.tile}/{fid}.png')
