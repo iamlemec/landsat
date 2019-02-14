@@ -1,9 +1,10 @@
 import os
 import numpy as np
 import pandas as pd
+import scipy.sparse as sp
 from PIL import Image
 from pyproj import Proj
-from coord_transform import bd2wgs, gcj2wgs
+from coord_transform import bd2wgs, gcj2wgs, wgs2utm
 import mectools.hyper as hy
 
 def ensure_wgs(lon, lat, proj):
@@ -16,9 +17,12 @@ def ensure_wgs(lon, lat, proj):
     else:
         raise('Unknown projection')
 
+def load_index(index):
+    return pd.read_csv(index).dropna(subset=['PRODUCT_ID'])
+
 def find_scene(lon, lat, index, best=True):
     if type(index) is str:
-        index = pd.read_csv(index)
+        index = load_index(index)
     prods = index[
         (index['NORTH_LAT'] >= lat) &
         (index['SOUTH_LAT'] <= lat) &
@@ -34,7 +38,7 @@ def find_scene(lon, lat, index, best=True):
         best = prods.loc[dist.idxmin()]
         return best['PRODUCT_ID']
     else:
-        return index
+        return prods
 
 def parse_mtl(fname):
     # hacky parse
@@ -91,7 +95,7 @@ def index_firm_scenes(firms, fout, index, chan='B8', proj='bd-09'):
     if type(firms) is str:
         firms = pd.read_csv(firms)
     if type(index) is str:
-        index = pd.read_csv(index)
+        index = load_index(index)
     firms = [(tag, *ensure_wgs(lon, lat, proj=proj)) for tag, lon, lat in firms[['tag', 'lon', 'lat']].values]
     prods = [(tag, lon, lat, find_scene(lon, lat, index)) for tag, lon, lat in hy.progress(firms, per=100_000)]
     prods = pd.DataFrame(prods, columns=['tag', 'lon', 'lat', 'prod'])
@@ -129,3 +133,34 @@ def extract_firm_tiles(prods, rad, size=256, resample=Image.LANCZOS, chan='B8', 
 # census = pd.read_csv(fname_census, usecols=coldefs).rename(columns=coldefs).dropna()
 # location_tools.index_firm_scenes(census, fout=fname_target, index=fname_scenes)
 # location_tools.extract_firm_tiles(fname_target, [512, 1024])
+
+##
+## density
+##
+
+def extract_density_tile(lon, lat, density='density', rad=128, size=256, proj='bd-09', resample=Image.LANCZOS):
+    lon, lat = ensure_wgs(lon, lat, proj)
+    zone = wgs2utm(lon, lat)
+    print(zone)
+    cells = pd.read_csv(f'{density}/utm_cells.csv', index_col='utm')
+    N = cells.loc[zone, 'N']
+    pixel = cells.loc[zone, 'pixel']
+    cell = cells[['utm_west', 'utm_south', 'size']].loc[zone]
+
+    proj = Proj(f'+proj=utm +zone={zone}, +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
+    hist = pd.read_csv(f'{density}/density_utm{zone}_{pixel}px.csv')
+    mat = sp.csr_matrix((hist['density'], (hist['pix_east'], hist['pix_north'])), shape=(N, N))
+
+    x, y = proj(lon, lat)
+    fx = (x-cell['utm_west'])/cell['size']
+    fy = (y-cell['utm_south'])/cell['size']
+    print(fx, fy)
+    px, py = int(fx*N), int(fy*N)
+
+    print(px, py)
+    tile = mat[px-rad:px+rad, py-rad:py+rad].toarray()
+    tile = tile/4 # to get most of the action in [0, 255]
+    tile = np.clip(tile, 0, 255).astype(np.uint8)
+    im = Image.fromarray(tile)
+
+    return im

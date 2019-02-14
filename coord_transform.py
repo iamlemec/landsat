@@ -9,15 +9,6 @@ b = a * (1 - f)
 ee = 1 - (b * b) / (a * a)
 
 def outOfChina(lng, lat):
-    """check weather lng and lat out of china
-
-    Arguments:
-        lng {float} -- longitude
-        lat {float} -- latitude
-
-    Returns:
-        Boolean -- True or False
-    """
     return not (72.004 <= lng <= 137.8347 and 0.8293 <= lat <= 55.8271)
 
 def transformLat(x, y):
@@ -35,16 +26,6 @@ def transformLon(x, y):
     return ret
 
 def wgs2gcj(wgsLon, wgsLat):
-    """wgs coord to gcj
-
-    Arguments:
-        wgsLon {float} -- lon
-        wgsLat {float} -- lat
-
-    Returns:
-        tuple -- gcj coords
-    """
-
     if outOfChina(wgsLon, wgsLat):
         return wgsLon, wgsLat
     dLat = transformLat(wgsLon - 105.0, wgsLat - 35.0)
@@ -100,3 +81,36 @@ def bd2wgs(bdLon, bdLat):
     gcj = bd2gcj(bdLon, bdLat)
     return gcj2wgs(gcj[0], gcj[1])
 
+##
+## UTM conversions
+##
+
+rows = 'CDEFGHJKLMNPQRSTUVWX'
+zones = [z for z in range(1, 60+1)]
+frow = {i: c for i, c in enumerate(rows)}
+rrow = {c: i for i, c in enumerate(rows)}
+
+def wgs2utm(lon_wgs, lat_wgs):
+    idx_lon = int(round(lon_wgs/6.0 + 30.5))
+    idx_lat = int(round(lat_wgs/8.0 + 9.5))
+    utm_lon = ((idx_lon-1) % 60) + 1
+    utm_lat = frow[idx_lat]
+    return f'{utm_lon}{utm_lat}'
+
+def utm_center_wgs(lon_utm, lat_utm):
+    idx_lon = lon_utm - 1
+    idx_lat = rrow[lat_utm]
+    lon_wgs = 6*(idx_lon - 30) + 3
+    lat_wgs = 8*(idx_lat - 10) + 4
+    return lon_wgs, lat_wgs
+
+def gen_utm_centers():
+    for z, r in product(zones, rows):
+        utm = f'{z}{r}'
+        proj = Proj(f'+proj=utm +zone={utm}, +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
+        lon, lat = utm_center_wgs(z, r)
+        east, north = proj(lon, lat)
+        yield utm, lon, lat, east, north
+
+def utm_centers():
+    return pd.DataFrame(gen_utm_centers(), columns=['utm', 'lon', 'lat', 'east', 'north'])
