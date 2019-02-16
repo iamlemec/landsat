@@ -27,7 +27,7 @@ def argify(f):
 
 # utm gridding
 size = 1e6 # kilometers
-pixel = 150 # meters
+pixel = 15 # meters
 N = int(np.round(size/pixel))
 rad = 128 # pixel radius
 ulon = np.linspace(-size/2, size/2, N+1)
@@ -75,10 +75,10 @@ groups = firms.groupby('utm_zone').groups
 for zone, idx in groups.items():
     this_cent = utm_cent.loc[zone]
     df = firms[
-        (firms['lon_wgs84'] >= this_cent['lon_west'] - 1) &
-        (firms['lon_wgs84'] <  this_cent['lon_east'] + 1) &
-        (firms['lat_wgs84'] >= this_cent['lat_south'] - 1) &
-        (firms['lat_wgs84'] <  this_cent['lat_north'] + 1)
+        (firms['lon_wgs84'] >= this_cent['lon_west'] - 2) &
+        (firms['lon_wgs84'] <  this_cent['lon_east'] + 2) &
+        (firms['lat_wgs84'] >= this_cent['lat_south'] - 2) &
+        (firms['lat_wgs84'] <  this_cent['lat_north'] + 2)
     ].copy()
 
     this_proj = utm_proj[zone]
