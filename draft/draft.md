@@ -41,9 +41,11 @@ There are a wide variety of ways that cities and firms can be laid out. This inc
 
 Shanghai is, of course, notably larger in terms of population and area, though it is also quite a bit more dense with firms. The former is also distinguished by its division in two by the Huangpu River, though Xi'an itself is heavily influenced by its ancient city wall that surround core of roughly 1.5 by 2 kilometers. Another notable feature seen in the southwest quadrant of the firm density overlay is the Xi'an Hi-tech Industrial Development Zone.
 
-Various methods have been developed to measure and quantify firm *clustering* (how they are arranged geographically, particularly at high density) and *agglomeration* (their tendency to group together by industry). Notable for agglomeration are those developed by Ellison and Glaeser (1997) and Holmes and Stevens (2002), as well as the more recent example of Duranton and Overman (2004). Clustering is often characterized by some localized measure of density.
+Various methods have been developed to measure and quantify firm *clustering* (how they are arranged geographically, particularly at high density) and *agglomeration* (their tendency to group together by industry). Studies on the relationship between geographic concentration and firm growth require an accurate measure of firm location patterns. @[ellison1997geographic] using discrete spatial units like states to measure the location patterns of industries across regions. Discrete spatial units that capture relevant regional markets offer a reasonable starting point for understanding location patterns. @[maurel1999measure] and @[devereux2004geographic] develop alternative indices of localization taking similar approach. However, indices like @[ellison1997geographic] are always sensitive to the choice of regional boundaries, e.g., counties, cities or states. Outcomes may vary to a large degree when changing from one aggregation level to another. Furthermore, spatial divisions normally do not depend on economic characteristics but on administrative classifications.
 
-However, such aggregated measures discard much of the micro-structure of the rich, high-dimensional data we are drawing from. To address this, we propose taking advantage of recent advanced in deep learning motivated primarily by computer vision applications. The inputs are similar, namely two-dimensional maps and images, and the goal remains prediction. In the case, we don't wish to predict, say the identity or class of the object being depicted, but rather some outcome of the firm at the center of a particular map, such as productivity, profitability, patenting rate, or revenue growth.
+@[duranton2005testing] instead proposes analyzing spatial clustering using distance-based methods that do not discretize an area into spatial subunits but see it as a continuous space. Distance-based methods have a more longstanding tradition in disciplines such as forestry or astronomy but have rarely been used for spatial economics. This is mainly due to standard distance-based methods compare a point pattern with a theoretical topographic concentration, generally using a spatial Poisson process. However, in economics, this comparison is not meaningful since firms cannot settle anywhere. Locations of firms are highly restricted due to planning regularities, accessibility, and properties of the surface (mountains, lakes, swamps, etc.). To overcome the shortcomings of topographic measures, @[duranton2005testing] measure the spatial concentration of industry relative to the overall localization of firms in the area under investigation. A growing literature has applied this measure in understanding motivation for agglomeration (@[ellison2010causes], @[ellison2010causes]; @[alfaro2014global], @[alfaro2014global]). However, the use of the usage of this distance-based methods is not only limited by its high demand for spatially fine-grained data and computation but also not being able to measure the relative localization of individual firms.
+
+Nonetheless, such aggregated measures discard much of the micro-structure of the rich, high-dimensional data we are drawing from. To address this, we propose taking advantage of recent advanced in deep learning motivated primarily by computer vision applications. The inputs are similar, namely two-dimensional maps and images, and the goal remains prediction. In the case, we don't wish to predict, say the identity or class of the object being depicted, but rather some outcome of the firm at the center of a particular map, such as productivity, profitability, patenting rate, or revenue growth.
 
 One of the major challenges with such an approach is that much the information present the maps above, for instance the distance to the city core, are in fact proxies for other existing features such as industry. Thus the task is not to predict unconditional features, but to predict residuals left over after controlling for known factors. An alternative to this approach would also be to incorporate such features into a unified analysis and let the optimization algorithm sort out the proper weights.
 
@@ -56,3 +58,42 @@ For comparison, ImageNet has over 14M images in its database, while our dataset 
 # Results
 
 TBD
+
+# References
+
+@@ [duranton2005testing]
+title: Testing for localization using micro-geographic data
+author: Gilles Duranton; Henry Overman
+journal: The Review of Economic Studies
+year: 2005
+
+@@ [ellison1997geographic]
+title: Geographic concentration in US manufacturing industries: a dartboard approach
+author: Glenn Ellison; Edward Glaeser
+journal: Journal of Political Economy
+year: 1997
+
+@@ [maurel1999measure]
+title: A measure of the geographic concentration in French manufacturing industries
+author: Françoise Maurel; Béatrice Sédillot
+journal: Regional Science and Urban Economics
+year: 1999
+
+@@ [devereux2004geographic]
+title: The geographic distribution of production activity in the UK
+author: Michael Devereux; Rachel Griffith; Helen Simpson
+journal: Regional Science and Urban Economics
+year: 2004
+
+@@ [alfaro2014global]
+title: The global agglomeration of multinational firms
+author: Laura Alfaro; Maggie Xiaoyang Chen
+journal: Journal of International Economics
+year: 2014
+
+@@ [ellison2010causeu]
+title: What causes industry agglomeration? Evidence from coagglomeration patterns
+author: Glenn Ellison; Edward Glaeser; William Kerr
+journal: American Economic Review
+year: 2010
+
