@@ -7,6 +7,10 @@ from pyproj import Proj
 from coord_transform import bd2wgs, gcj2wgs, wgs2utm
 import mectools.hyper as hy
 
+# lest pillow complain
+Image.MAX_IMAGE_PIXELS = 1000000000
+
+# all purpose transform
 def ensure_wgs(lon, lat, proj):
     if proj == 'bd-09':
         return bd2wgs(lon, lat)
@@ -16,6 +20,22 @@ def ensure_wgs(lon, lat, proj):
         return lon, lat
     else:
         raise('Unknown projection')
+
+# tuple to args
+def argify(f):
+    def f1(x):
+        y = f(*x)
+        return list(y) if type(y) is tuple else y
+    return f1
+
+def store_chunk(tag, loc, ext='jpg'):
+    tag = f'{tag:07d}'
+    sub = tag[:4]
+    psub = f'{loc}/{sub}'
+    if not os.path.isdir(psub):
+        os.mkdir(psub)
+    ptag = f'{psub}/{tag}.{ext}'
+    return ptag
 
 # load scene index
 def load_index(index):
@@ -71,13 +91,19 @@ def load_scene(pid, chan='B8'):
 # find scenes corresponding. data is (tag, lon, lat) list
 def index_firm_scenes(firms, fout, index, chan='B8', proj='bd-09'):
     if type(firms) is str:
-        firms = pd.read_csv(firms)
+        coldefs = {
+            'No': 'id',
+            'longitude': 'lon_bd09',
+            'latitude': 'lat_bd09',
+        }
+        firms = pd.read_csv(firms, usecols=coldefs).rename(columns=coldefs).dropna()
     if type(index) is str:
         index = load_index(index)
-    firms = [(tag, *ensure_wgs(lon, lat, proj=proj)) for tag, lon, lat in firms[['tag', 'lon', 'lat']].values]
-    prods = [(tag, lon, lat, find_scene(lon, lat, index)) for tag, lon, lat in hy.progress(firms, per=100_000)]
-    prods = pd.DataFrame(prods, columns=['tag', 'lon', 'lat', 'prod'])
-    prods.to_csv(fout, index=False)
+    scene = lambda lon, lat: find_scene(lon, lat, index)
+    firms[['lon_wgs84', 'lat_wgs84']] = firms[['lon_bd09', 'lat_bd09']].apply(argify(bd2wgs), raw=True, result_type='expand', axis=1)
+    firms['utm_zone'] = firms[['lon_wgs84', 'lat_wgs84']].apply(argify(wgs2utm), raw=True, axis=1)
+    firms['prod_id'] = firms[['lon_wgs84', 'lat_wgs84']].apply(argify(scene), raw=True, axis=1)
+    firms.to_csv(fout, index=False)
 
 # assumes WGS84 datum
 def extract_satelite_core(lon, lat, meta, image, rad=512):
@@ -92,35 +118,40 @@ def extract_satelite_core(lon, lat, meta, image, rad=512):
     sx, sy = image.size
     px, py = int(fx*sx), int((1-fy)*sy) # image origin is top-left
     box = (px-rad, py-rad, px+rad, py+rad)
-    tile = image.crop(box)
+    im = image.crop(box)
 
-    return tile
+    return im
 
 # extract just one tile, for testing
-def extract_satelite_tile(lon, lat, index, rad, size=None, proj='bd-09', chan='B8', resample=Image.LANCZOS):
+def extract_satelite_tile(lon, lat, index, rad, size=None, proj='bd-09', chan='B8', image=True, resample=Image.LANCZOS):
     lon, lat = ensure_wgs(lon, lat, proj)
     pid = find_scene(lon, lat, index)
     meta, image = load_scene(pid, chan=chan)
-    tile = extract_satelite_core(lon, lat, meta, image, rad=rad)
-    if size is not None:
-        tile = tile.resize((size, size), resample=resample)
-    return tile
+    im = extract_satelite_core(lon, lat, meta, image, rad=rad)
+    im = im.resize((size, size), resample=resample)
+    if image:
+        return im
+    else:
+        return np.asarray(im)
 
 # prods is a (tag, lon, lat, prod) file. assumes WGS84 datum
-def extract_satelite_batch(prods, rad, size=256, resample=Image.LANCZOS, chan='B8', loc='tiles', ext='jpg'):
-    if type(prods) is str:
-        prods = pd.read_csv(prods)
-    prods = prods.sort_values(by=['prod', 'tag'])
-    pmap = prods.groupby('prod').groups
+def extract_satelite_firm(firms, rad, size=256, resample=Image.LANCZOS, chan='B8', output='tiles/landsat', ext='jpg'):
+    if type(firms) is str:
+        prods = pd.read_csv(firms)
+    firms = firms.sort_values(by=['prod_id', 'id'])
+    pmap = firms.groupby('prod_id').groups
     print(len(pmap))
 
     for pid in pmap:
         print(pid)
         meta, image = load_scene(pid, chan=chan)
         for idx in pmap[pid]:
-            tag, lon, lat = prods.loc[idx][['tag', 'lon', 'lat']]
+            tag, lon, lat = firms.loc[idx][['id', 'lon_wgs84', 'lat_wgs84']]
             for r in rad:
-                fname = f'{loc}/{tag}_r{r}_s{size}.{ext}'
+                path = f'{output}/{r}px'
+                if not os.path.isdir(path):
+                    os.mkdir(path)
+                fname = store_chunk(tag, path, ext=ext)
                 if not os.path.exists(fname):
                     tile = extract_satelite_core(lon, lat, meta, image, rad=r)
                     tile = tile.resize((size, size), resample=resample)
@@ -143,7 +174,7 @@ def extract_satelite_batch(prods, rad, size=256, resample=Image.LANCZOS, chan='B
 ## density
 ##
 
-def extract_density_tile(lon, lat, density='density', rad=128, size=256, proj='bd-09', resample=Image.LANCZOS):
+def extract_density_tile(lon, lat, density='density', rad=128, size=256, proj='bd-09', image=True, resample=Image.LANCZOS):
     lon, lat = ensure_wgs(lon, lat, proj)
     zone = wgs2utm(lon, lat)
     cells = pd.read_csv(f'{density}/utm_cells.csv', index_col='utm')
@@ -161,30 +192,56 @@ def extract_density_tile(lon, lat, density='density', rad=128, size=256, proj='b
     px, py = int(fx*N), int(fy*N)
 
     tile = mat[py-rad:py+rad, px-rad:px+rad].toarray()
-    tile = tile/4
-    tile = np.clip(tile, 0, 255).astype(np.uint8)
-    tile = Image.fromarray(tile).transpose(Image.FLIP_TOP_BOTTOM) # image origin is top-left
-    if size is not None:
-        tile = tile.resize((size, size), resample=resample)
 
-    return tile
+    if image:
+        tile = np.clip(tile/4, 0, 255).astype(np.uint8)
+        im = Image.fromarray(tile).transpose(Image.FLIP_TOP_BOTTOM) # image origin is top-left
+        im = im.resize((size, size), resample=resample)
+        return im
+    else:
+        return tile
 
 # scenes is a (tag, lon, lat) file. assumes WGS84 datum
-def extract_firm_density(firms, rad, size=256, resample=Image.LANCZOS, chan='B8', loc='tiles', ext='jpg'):
+def extract_density_firm(firms, rad, size=256, resample=Image.LANCZOS, density='density', output='tiles/density', ext='jpg'):
     if type(firms) is str:
-        prods = pd.read_csv(firms)
-    prods = prods.sort_values(by=['prod', 'tag'])
-    pmap = prods.groupby('prod').groups
-    print(len(pmap))
+        firms = pd.read_csv(firms)
+    if type(rad) is int:
+        rad = [rad]
 
-    for pid in pmap:
-        print(pid)
-        meta, image = load_scene(pid, chan=chan)
-        for idx in pmap[pid]:
-            tag, lon, lat = prods.loc[idx][['tag', 'lon', 'lat']]
+    cells = pd.read_csv(f'{density}/utm_cells.csv', index_col='utm')
+
+    firms = firms.sort_values(by=['utm_zone', 'id'])
+    umap = firms.groupby('utm_zone').groups
+    print(len(umap))
+
+    for zone in umap:
+        print(zone)
+
+        N = cells.loc[zone, 'N']
+        pixel = cells.loc[zone, 'pixel']
+        west, south, span = cells.loc[zone, ['utm_west', 'utm_south', 'size']]
+        proj = Proj(f'+proj=utm +zone={zone}, +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
+
+        hist = pd.read_csv(f'{density}/density_utm{zone}_{pixel}px.csv')
+        mat = sp.csr_matrix((hist['density'], (hist['pix_north'], hist['pix_east'])), shape=(N, N))
+
+        for idx in umap[zone]:
+            tag, lon, lat = firms.loc[idx, ['id', 'lon_wgs84', 'lat_wgs84']]
+
             for r in rad:
-                fname = f'{loc}/{tag}_r{r}_s{size}.{ext}'
+                path = f'{output}/{r}px'
+                if not os.path.isdir(path):
+                    os.mkdir(path)
+
+                fname = store_chunk(tag, path, ext=ext)
                 if not os.path.exists(fname):
-                    tile = extract_tile(lon, lat, meta, image, rad=r)
-                    tile = tile.resize((size, size), resample=resample)
-                    tile.save(fname)
+                    x, y = proj(lon, lat)
+                    fx, fy = (x-west)/span, (y-south)/span
+                    px, py = int(fx*N), int(fy*N)
+
+                    tile = mat[py-r:py+r, px-r:px+r].toarray()
+                    tile = np.clip(tile/4, 0, 255).astype(np.uint8)
+
+                    im = Image.fromarray(tile).transpose(Image.FLIP_TOP_BOTTOM) # image origin is top-left
+                    im = im.resize((size, size), resample=resample)
+                    im.save(fname)

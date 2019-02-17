@@ -7,12 +7,13 @@ import scipy.sparse as sp
 from PIL import Image
 from pyproj import Proj
 from coord_transform import bd2wgs, wgs2utm
+from location_tools import load_firms
 from mectools.hyper import progress
 
 parser = argparse.ArgumentParser(description='Generate clusting and information')
-parser.add_argument('--data', type=str, help='Path to firm data file')
+parser.add_argument('data', type=str, help='Path to firm data file')
 parser.add_argument('--dense', type=str, default='density', help='Density directory')
-parser.add_argument('--tile', type=str, default='tiles/cluster', help='Tile directory')
+# parser.add_argument('--tile', type=str, default='tiles/cluster', help='Tile directory')
 # parser.add_argument('--width', type=int, default=None, help='Gaussian kernel width')
 # parser.add_argument('--weight', type=str, default=None, help='Weighting variable')
 # parser.add_argument('--ind', type=int, default=None, help='Industry to select')
@@ -55,7 +56,7 @@ coldefs = {
 }
 
 # load firm data
-firms = pd.read_csv(args.data, usecols=coldefs).rename(columns=coldefs)
+firms = load_firms(args.data)
 firms = firms.dropna().drop_duplicates('id')
 firms['id'] = firms['id'].astype(np.int)
 

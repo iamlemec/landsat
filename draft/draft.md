@@ -63,37 +63,42 @@ TBD
 
 @@ [duranton2005testing]
 title: Testing for localization using micro-geographic data
-author: Gilles Duranton; Henry Overman
+authors: Gilles Duranton; Henry Overman
 journal: The Review of Economic Studies
 year: 2005
+doi: 10.1111/0034-6527.00362
 
 @@ [ellison1997geographic]
 title: Geographic concentration in US manufacturing industries: a dartboard approach
-author: Glenn Ellison; Edward Glaeser
+authors: Glenn Ellison; Edward Glaeser
 journal: Journal of Political Economy
 year: 1997
+doi: 10.1086/262098
 
 @@ [maurel1999measure]
 title: A measure of the geographic concentration in French manufacturing industries
-author: Françoise Maurel; Béatrice Sédillot
+authors: Françoise Maurel; Béatrice Sédillot
 journal: Regional Science and Urban Economics
 year: 1999
+doi: 10.1016/S0166-0462(99)00020-4
 
 @@ [devereux2004geographic]
 title: The geographic distribution of production activity in the UK
-author: Michael Devereux; Rachel Griffith; Helen Simpson
+authors: Michael Devereux; Rachel Griffith; Helen Simpson
 journal: Regional Science and Urban Economics
 year: 2004
+doi: 10.1016/S0166-0462(03)00073-5
 
 @@ [alfaro2014global]
 title: The global agglomeration of multinational firms
-author: Laura Alfaro; Maggie Xiaoyang Chen
+authors: Laura Alfaro; Maggie Xiaoyang Chen
 journal: Journal of International Economics
 year: 2014
+doi: 10.1016/j.jinteco.2014.09.001
 
-@@ [ellison2010causeu]
+@@ [ellison2010causes]
 title: What causes industry agglomeration? Evidence from coagglomeration patterns
-author: Glenn Ellison; Edward Glaeser; William Kerr
+authors: Glenn Ellison; Edward Glaeser; William Kerr
 journal: American Economic Review
 year: 2010
-
+doi: 10.1257/aer.100.3.1195
