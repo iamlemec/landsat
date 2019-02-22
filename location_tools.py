@@ -4,8 +4,8 @@ import pandas as pd
 import scipy.sparse as sp
 from PIL import Image
 from pyproj import Proj
+from scipy.ndimage.filters import gaussian_filter
 from coord_transform import bd2wgs, gcj2wgs, wgs2utm
-import mectools.hyper as hy
 
 # lest pillow complain
 Image.MAX_IMAGE_PIXELS = 1000000000
@@ -91,12 +91,7 @@ def load_scene(pid, chan='B8'):
 # find scenes corresponding. data is (tag, lon, lat) list
 def index_firm_scenes(firms, fout, index, chan='B8', proj='bd-09'):
     if type(firms) is str:
-        coldefs = {
-            'No': 'id',
-            'longitude': 'lon_bd09',
-            'latitude': 'lat_bd09',
-        }
-        firms = pd.read_csv(firms, usecols=coldefs).rename(columns=coldefs).dropna()
+        firms = pd.read_csv(firms).dropna()
     if type(index) is str:
         index = load_index(index)
     scene = lambda lon, lat: find_scene(lon, lat, index)
@@ -157,24 +152,30 @@ def extract_satelite_firm(firms, rad, size=256, resample=Image.LANCZOS, chan='B8
                     tile = tile.resize((size, size), resample=resample)
                     tile.save(fname)
 
-# indexing
-# fname_scenes = 'targets/google_scenes_2002_summer.csv'
-# fname_census = '../cluster/census/census_2004_geocode.csv'
-# fname_target = 'targets/census_firms_2004.csv'
-# cols = {
-#     'No': 'tag',
-#     'longitude': 'lon',
-#     'latitude': 'lat'
-# }
-# census = pd.read_csv(fname_census, usecols=coldefs).rename(columns=coldefs).dropna()
-# location_tools.index_firm_scenes(census, fout=fname_target, index=fname_scenes)
-# location_tools.extract_firm_tiles(fname_target, [512, 1024])
-
 ##
 ## density
 ##
 
-def extract_density_tile(lon, lat, density='density', rad=128, size=256, proj='bd-09', image=True, resample=Image.LANCZOS):
+def extract_density_core(mat, px, py, rad=128, size=256, sigma=2, norm=1, image=True):
+    # extract area
+    den = mat[py-rad:py+rad, px-rad:px+rad].toarray()
+
+    # blur image at sigma
+    den = gaussian_filter(den, sigma=sigma)
+
+    # normalize image
+    den = den/norm
+
+    if image:
+        # quantize, pitch correct, and overly inspect
+        im = Image.fromarray((255*den).astype(np.uint8))
+        im = im.transpose(Image.FLIP_TOP_BOTTOM)
+        im = im.resize((size, size), resample=Image.LANCZOS)
+        return im
+    else:
+        return bend
+
+def extract_density_tile(lon, lat, density='density', rad=128, size=256, sigma=2, norm=1, proj='bd-09', image=True):
     lon, lat = ensure_wgs(lon, lat, proj)
     zone = wgs2utm(lon, lat)
     cells = pd.read_csv(f'{density}/utm_cells.csv', index_col='utm')
@@ -191,18 +192,10 @@ def extract_density_tile(lon, lat, density='density', rad=128, size=256, proj='b
     fy = (y-cell['utm_south'])/cell['size']
     px, py = int(fx*N), int(fy*N)
 
-    tile = mat[py-rad:py+rad, px-rad:px+rad].toarray()
-
-    if image:
-        tile = np.clip(tile/4, 0, 255).astype(np.uint8)
-        im = Image.fromarray(tile).transpose(Image.FLIP_TOP_BOTTOM) # image origin is top-left
-        im = im.resize((size, size), resample=resample)
-        return im
-    else:
-        return tile
+    return extract_density_core(mat, px, py, rad=rad, size=size, sigma=sigma, norm=norm, image=image)
 
 # scenes is a (tag, lon, lat) file. assumes WGS84 datum
-def extract_density_firm(firms, rad, size=256, resample=Image.LANCZOS, density='density', output='tiles/density', ext='jpg'):
+def extract_density_firm(firms, rad, size=256, sigma=2, norm=1, overwrite=False, density='density', output='tiles/density', ext='jpg'):
     if type(firms) is str:
         firms = pd.read_csv(firms)
     if type(rad) is int:
@@ -234,14 +227,10 @@ def extract_density_firm(firms, rad, size=256, resample=Image.LANCZOS, density='
                     os.mkdir(path)
 
                 fname = store_chunk(tag, path, ext=ext)
-                if not os.path.exists(fname):
+                if overwrite or not os.path.exists(fname):
                     x, y = proj(lon, lat)
                     fx, fy = (x-west)/span, (y-south)/span
                     px, py = int(fx*N), int(fy*N)
 
-                    tile = mat[py-r:py+r, px-r:px+r].toarray()
-                    tile = np.clip(tile/4, 0, 255).astype(np.uint8)
-
-                    im = Image.fromarray(tile).transpose(Image.FLIP_TOP_BOTTOM) # image origin is top-left
-                    im = im.resize((size, size), resample=resample)
+                    im = extract_density_core(mat, px, py, rad=r, size=size, sigma=sigma, norm=norm)
                     im.save(fname)
