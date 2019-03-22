@@ -28,6 +28,7 @@ def argify(f):
         return list(y) if type(y) is tuple else y
     return f1
 
+# to limit directory sizes
 def store_chunk(tag, loc, ext='jpg'):
     tag = f'{tag:07d}'
     sub = tag[:4]
@@ -36,6 +37,10 @@ def store_chunk(tag, loc, ext='jpg'):
         os.mkdir(psub)
     ptag = f'{psub}/{tag}.{ext}'
     return ptag
+
+##
+## scenes
+##
 
 # load scene index
 def load_index(index):
@@ -100,6 +105,10 @@ def index_firm_scenes(firms, fout, index, chan='B8', proj='bd-09'):
     firms['prod_id'] = firms[['lon_wgs84', 'lat_wgs84']].apply(argify(scene), raw=True, axis=1)
     firms.to_csv(fout, index=False)
 
+##
+## satellite
+##
+
 # assumes WGS84 datum
 def extract_satelite_core(lon, lat, meta, image, rad=512):
     utm_zone = meta['UTM_ZONE']
@@ -129,7 +138,7 @@ def extract_satelite_tile(lon, lat, index, rad, size=None, proj='bd-09', chan='B
     else:
         return np.asarray(im)
 
-# prods is a (tag, lon, lat, prod) file. assumes WGS84 datum
+# firms is a (tag, lon, lat, prod) file. assumes WGS84 datum
 def extract_satelite_firm(firms, rad, size=256, resample=Image.LANCZOS, chan='B8', output='tiles/landsat', ext='jpg'):
     if type(firms) is str:
         prods = pd.read_csv(firms)
@@ -161,10 +170,12 @@ def extract_density_core(mat, px, py, rad=128, size=256, sigma=2, norm=1, image=
     den = mat[py-rad:py+rad, px-rad:px+rad].toarray()
 
     # blur image at sigma
-    den = gaussian_filter(den, sigma=sigma)
+    if sigma is not None:
+        den = gaussian_filter(den, sigma=sigma)
 
     # normalize image
-    den = den/norm
+    if norm is not None:
+        den /= norm
 
     if image:
         # quantize, pitch correct, and overly inspect
@@ -173,7 +184,7 @@ def extract_density_core(mat, px, py, rad=128, size=256, sigma=2, norm=1, image=
         im = im.resize((size, size), resample=Image.LANCZOS)
         return im
     else:
-        return bend
+        return den
 
 def extract_density_tile(lon, lat, density='density', rad=128, size=256, sigma=2, norm=1, proj='bd-09', image=True):
     lon, lat = ensure_wgs(lon, lat, proj)
