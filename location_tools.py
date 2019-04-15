@@ -93,10 +93,10 @@ def load_scene(pid, chan='B8'):
     image = Image.open(f'scenes/{pid}_{chan}.TIF')
     return meta, image
 
-# find scenes corresponding. data is (tag, lon, lat) list
-def index_firm_scenes(firms, fout, index, chan='B8', proj='bd-09'):
+# find scenes corresponding. data is (id, lon, lat) list
+def index_firm_scenes(firms, fout, index):
     if type(firms) is str:
-        firms = pd.read_csv(firms).dropna()
+        firms = pd.read_csv(firms)[['id', 'lon_bd09', 'lat_bd09']].dropna()
     if type(index) is str:
         index = load_index(index)
     scene = lambda lon, lat: find_scene(lon, lat, index)
@@ -205,7 +205,7 @@ def extract_density_tile(lon, lat, density='density', rad=128, size=256, sigma=2
 
     return extract_density_core(mat, px, py, rad=rad, size=size, sigma=sigma, norm=norm, image=image)
 
-# scenes is a (tag, lon, lat) file. assumes WGS84 datum
+# firms is a (id, lon, lat) file. assumes WGS84 datum
 def extract_density_firm(firms, rad, size=256, sigma=2, norm=1, overwrite=False, density='density', output='tiles/density', ext='jpg'):
     if type(firms) is str:
         firms = pd.read_csv(firms)
