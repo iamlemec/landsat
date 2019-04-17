@@ -6,6 +6,7 @@ from PIL import Image
 from pyproj import Proj
 from scipy.ndimage.filters import gaussian_filter
 from coord_transform import bd2wgs, gcj2wgs, wgs2utm
+import config as cfg
 
 # lest pillow complain
 Image.MAX_IMAGE_PIXELS = 1000000000
@@ -127,9 +128,10 @@ def extract_satelite_core(lon, lat, meta, image, rad=512):
     return im
 
 # extract just one tile, for testing
-def extract_satelite_tile(lon, lat, index, rad, size=None, proj='bd-09', chan='B8', image=True, resample=Image.LANCZOS):
+def extract_satelite_tile(lon, lat, rad, pid=None, index=None, size=None, proj='bd-09', chan='B8', image=True, resample=Image.LANCZOS):
     lon, lat = ensure_wgs(lon, lat, proj)
-    pid = find_scene(lon, lat, index)
+    if pid is None:
+        pid = find_scene(lon, lat, index)
     meta, image = load_scene(pid, chan=chan)
     im = extract_satelite_core(lon, lat, meta, image, rad=rad)
     im = im.resize((size, size), resample=resample)
@@ -165,48 +167,51 @@ def extract_satelite_firm(firms, rad, size=256, resample=Image.LANCZOS, chan='B8
 ## density
 ##
 
-def extract_density_core(mat, px, py, rad=128, size=256, sigma=2, norm=1, image=True):
+# sigma: blur in meters
+# norm: density units
+def extract_density_core(mat, px, py, rad, size=256, sigma=2, norm=300, image=True):
     # extract area
     den = mat[py-rad:py+rad, px-rad:px+rad].toarray()
 
-    # blur image at sigma
+    # gaussian blur
     if sigma is not None:
         den = gaussian_filter(den, sigma=sigma)
 
-    # normalize image
+    # normalize and rectify
     if norm is not None:
-        den /= norm
+        # norm = np.quantile(den[den>0], rect)
+        den = den/(den+norm)
 
     if image:
         # quantize, pitch correct, and overly inspect
-        im = Image.fromarray((255*den).astype(np.uint8))
+        im = Image.fromarray((255*den).astype(np.uint8), 'L')
         im = im.transpose(Image.FLIP_TOP_BOTTOM)
         im = im.resize((size, size), resample=Image.LANCZOS)
         return im
     else:
         return den
 
-def extract_density_tile(lon, lat, density='density', rad=128, size=256, sigma=2, norm=1, proj='bd-09', image=True):
+def extract_density_tile(lon, lat, density='density', rad=128, size=256, sigma=25, norm=300, proj='bd-09', image=True):
     lon, lat = ensure_wgs(lon, lat, proj)
-    zone = wgs2utm(lon, lat)
+    utm_zone = wgs2utm(lon, lat)
     cells = pd.read_csv(f'{density}/utm_cells.csv', index_col='utm')
-    N = cells.loc[zone, 'N']
-    pixel = cells.loc[zone, 'pixel']
-    cell = cells[['utm_west', 'utm_south', 'size']].loc[zone]
+    pixel, N = cells.loc[utm_zone, 'pixel'], cells.loc[utm_zone, 'N']
+    west, south, span = cells.loc[utm_zone, ['utm_west', 'utm_south', 'size']]
 
-    proj = Proj(f'+proj=utm +zone={zone}, +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
-    hist = pd.read_csv(f'{density}/density_utm{zone}_{pixel}px.csv')
+    proj = Proj(f'+proj=utm +zone={utm_zone}, +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
+    hist = pd.read_csv(f'{density}/density_utm{utm_zone}_{pixel}px.csv')
     mat = sp.csr_matrix((hist['density'], (hist['pix_north'], hist['pix_east'])), shape=(N, N))
 
     x, y = proj(lon, lat)
-    fx = (x-cell['utm_west'])/cell['size']
-    fy = (y-cell['utm_south'])/cell['size']
+    fx = (x-west)/span
+    fy = (y-south)/span
     px, py = int(fx*N), int(fy*N)
 
-    return extract_density_core(mat, px, py, rad=rad, size=size, sigma=sigma, norm=norm, image=image)
+    psigma = sigma/pixel
+    return extract_density_core(mat, px, py, rad, size=size, sigma=psigma, norm=norm, image=image)
 
 # firms is a (id, lon, lat) file. assumes WGS84 datum
-def extract_density_firm(firms, rad, size=256, sigma=2, norm=1, overwrite=False, density='density', output='tiles/density', ext='jpg'):
+def extract_density_firm(firms, rad, size=256, sigma=25, norm=300, overwrite=False, density='density', output='tiles/density', ext='jpg'):
     if type(firms) is str:
         firms = pd.read_csv(firms)
     if type(rad) is int:
@@ -215,22 +220,25 @@ def extract_density_firm(firms, rad, size=256, sigma=2, norm=1, overwrite=False,
     cells = pd.read_csv(f'{density}/utm_cells.csv', index_col='utm')
 
     firms = firms.sort_values(by=['utm_zone', 'id'])
-    umap = firms.groupby('utm_zone').groups
-    print(len(umap))
+    utm_map = firms.groupby('utm_zone').groups
+    print(len(utm_map))
 
-    for zone in umap:
-        print(zone)
+    for utm_zone in utm_map:
+        print(utm_zone)
 
-        N = cells.loc[zone, 'N']
-        pixel = cells.loc[zone, 'pixel']
-        west, south, span = cells.loc[zone, ['utm_west', 'utm_south', 'size']]
-        proj = Proj(f'+proj=utm +zone={zone}, +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
+        pixel, N = cells.loc[utm_zone, 'pixel'], cells.loc[utm_zone, 'N']
+        west, south, span = cells.loc[utm_zone, ['utm_west', 'utm_south', 'size']]
+        proj = Proj(f'+proj=utm +zone={utm_zone}, +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
+        psigma = sigma/pixel
 
-        hist = pd.read_csv(f'{density}/density_utm{zone}_{pixel}px.csv')
+        hist = pd.read_csv(f'{density}/density_utm{utm_zone}_{pixel}px.csv')
         mat = sp.csr_matrix((hist['density'], (hist['pix_north'], hist['pix_east'])), shape=(N, N))
 
-        for idx in umap[zone]:
+        for idx in utm_map[utm_zone]:
             tag, lon, lat = firms.loc[idx, ['id', 'lon_wgs84', 'lat_wgs84']]
+            x, y = proj(lon, lat)
+            fx, fy = (x-west)/span, (y-south)/span
+            px, py = int(fx*N), int(fy*N)
 
             for r in rad:
                 path = f'{output}/{r}px'
@@ -239,9 +247,5 @@ def extract_density_firm(firms, rad, size=256, sigma=2, norm=1, overwrite=False,
 
                 fname = store_chunk(tag, path, ext=ext)
                 if overwrite or not os.path.exists(fname):
-                    x, y = proj(lon, lat)
-                    fx, fy = (x-west)/span, (y-south)/span
-                    px, py = int(fx*N), int(fy*N)
-
-                    im = extract_density_core(mat, px, py, rad=r, size=size, sigma=sigma, norm=norm)
+                    im = extract_density_core(mat, px, py, r, size=size, sigma=psigma, norm=norm)
                     im.save(fname)
