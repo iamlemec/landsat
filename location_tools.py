@@ -6,7 +6,6 @@ from PIL import Image
 from pyproj import Proj
 from scipy.ndimage.filters import gaussian_filter
 from coord_transform import bd2wgs, gcj2wgs, wgs2utm
-import config as cfg
 
 # lest pillow complain
 Image.MAX_IMAGE_PIXELS = 1000000000
@@ -34,8 +33,7 @@ def store_chunk(tag, loc, ext='jpg'):
     tag = f'{tag:07d}'
     sub = tag[:4]
     psub = f'{loc}/{sub}'
-    if not os.path.isdir(psub):
-        os.mkdir(psub)
+    os.makedirs(psub, exist_ok=True)
     ptag = f'{psub}/{tag}.{ext}'
     return ptag
 
@@ -210,8 +208,8 @@ def extract_density_tile(lon, lat, density='density', rad=128, size=256, sigma=2
     psigma = sigma/pixel
     return extract_density_core(mat, px, py, rad, size=size, sigma=psigma, norm=norm, image=image)
 
-# firms is a (id, lon, lat) file. assumes WGS84 datum
-def extract_density_firm(firms, rad, size=256, sigma=25, norm=300, overwrite=False, density='density', output='tiles/density', ext='jpg'):
+# firms is a (id, lon, lat) filename or dataframe. assumes WGS84 datum
+def extract_density_firm(firms, rad, size=256, sigma=25, norm=300, overwrite=False, density='density', output='tiles/density', ext='jpg', log=True):
     if type(firms) is str:
         firms = pd.read_csv(firms)
     if type(rad) is int:
@@ -220,11 +218,13 @@ def extract_density_firm(firms, rad, size=256, sigma=25, norm=300, overwrite=Fal
     cells = pd.read_csv(f'{density}/utm_cells.csv', index_col='utm')
 
     firms = firms.sort_values(by=['utm_zone', 'id'])
-    utm_map = firms.groupby('utm_zone').groups
-    print(len(utm_map))
+    utm_grp = firms.groupby('utm_zone')
+    utm_map = utm_grp.groups
+    utm_len = utm_grp.size()
+    if log: print(len(utm_map))
 
     for utm_zone in utm_map:
-        print(utm_zone)
+        if log: print(f'{utm_zone}: {utm_len[utm_zone]}')
 
         pixel, N = cells.loc[utm_zone, 'pixel'], cells.loc[utm_zone, 'N']
         west, south, span = cells.loc[utm_zone, ['utm_west', 'utm_south', 'size']]
@@ -242,10 +242,16 @@ def extract_density_firm(firms, rad, size=256, sigma=25, norm=300, overwrite=Fal
 
             for r in rad:
                 path = f'{output}/{r}px'
-                if not os.path.isdir(path):
-                    os.mkdir(path)
-
                 fname = store_chunk(tag, path, ext=ext)
                 if overwrite or not os.path.exists(fname):
                     im = extract_density_core(mat, px, py, r, size=size, sigma=psigma, norm=norm)
                     im.save(fname)
+
+# parallel version
+def extract_density_par(firms, rad, nproc=4, **kwargs):
+    from multiprocessing import Pool
+    def func(df):
+        extract_density_firm(df, rad, **kwargs)
+    chunks = np.array_split(firms, nproc)
+    with Pool(nproc) as p:
+        p.map(func, chunks)
