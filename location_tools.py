@@ -139,9 +139,12 @@ def extract_satelite_tile(lon, lat, rad, pid=None, index=None, size=None, proj='
         return np.asarray(im)
 
 # firms is a (tag, lon, lat, prod) file. assumes WGS84 datum
-def extract_satelite_firm(firms, rad, size=256, resample=Image.LANCZOS, chan='B8', output='tiles/landsat', ext='jpg'):
+def extract_satelite_firm(firms, rad, size=256, resample=Image.LANCZOS, chan='B8', output='tiles/landsat', ext='jpg', overwrite=False):
     if type(firms) is str:
-        prods = pd.read_csv(firms)
+        firms = pd.read_csv(firms)
+    if type(rad) is int:
+        rad = [rad]
+
     firms = firms.sort_values(by=['prod_id', 'id'])
     pmap = firms.groupby('prod_id').groups
     print(len(pmap))
@@ -153,10 +156,8 @@ def extract_satelite_firm(firms, rad, size=256, resample=Image.LANCZOS, chan='B8
             tag, lon, lat = firms.loc[idx][['id', 'lon_wgs84', 'lat_wgs84']]
             for r in rad:
                 path = f'{output}/{r}px'
-                if not os.path.isdir(path):
-                    os.mkdir(path)
                 fname = store_chunk(tag, path, ext=ext)
-                if not os.path.exists(fname):
+                if overwrite or not os.path.exists(fname):
                     tile = extract_satelite_core(lon, lat, meta, image, rad=r)
                     tile = tile.resize((size, size), resample=resample)
                     tile.save(fname)
