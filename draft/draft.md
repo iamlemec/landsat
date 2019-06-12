@@ -1,8 +1,12 @@
-#! Geographic Clustering of Firms in China
+#! Geographic Clustering of Firms: A Machine Learning Approach
 
 Douglas Hanley (University of Pittburgh)
 Chengying Luo (University of Pittburgh)
 Mingqin Wu (South China Normal University)
+
+# Abstract
+
+Understanding how the geographic arrangement of firms affects outcomes such as productivity and growth is a widely studied question in economics. Much of the literature has focused on constructing statistics that characterize firm clustering and using these as inputs into traditional regression analysis. In this paper, we use techniques developed in the field of machine learning (ML) to tackle this question. In particular, we employ convolutional neural networks (CNN) that are widely used in image classification tasks and apply them to the firm density maps considered in our setting. Using state-of-the-art techniques and tools from ML on comprehensive Chinese firm data, we find that such an approach has predictive power over and above traditional techniques. We investigate methods of interpreting such a complex algorithms analogous to the impulse response approach used with DSGE models. Additionally, we explore ways to account for confounding factors such as industry in our analysis, as well as to deal with issues of endogeneity of firm location choice through the use of instrumental variables.
 
 # Introduction
 
