@@ -100,7 +100,7 @@ $$
 
 ---
 
-## Higher Dimensionality
+## Characteristic Scale
 
 Duranton and Overman (2005) employ a **two-point correlation function** to measure what they call localization
 - this is simply the density of distances between pairs of firms (popular in astrophysics)
@@ -130,6 +130,8 @@ Distributions for pharmaceuticals (left) and textile machinery (right). Pharma i
 
 In general, we find that maps are extremely high dimensional objects, but how can we handle this in an economic setting?
 
+![Density Maps](images/density_map.png) <!-- .element class="full" -->
+
 ---
 
 ## Machine Vision
@@ -156,19 +158,14 @@ The canonical example is that of classifying pictures of hand-written digits (0â
 
 ## Application to Maps
 
-We can apply these to maps by rasterizing their continuous density into a grid of pixels
-- this is essentially a 2D binned histogram
+We can apply these to maps by rasterizing their continuous density into a grid of pixels ($\mathbb{R}_+^{N \cdot N}$)
 
-[example image]
+<p style="text-align: center;">
+<img alt="Sample Density" src="images/cell.png" style="width: 25%; display: inline; vertical-align: middle;"/>
+<span style="vertical-align: middle; font-size: 25px;">$\qquad\large\longrightarrow\qquad\text{Productivity}$</span>
+</p>
 
 Instead of classifying them into digits, we instead want to predict other properties of firms represented therein (like productivity or growth)
-
----
-
-## Machine Learning
-
-Inference vs Prediction
-- Or: Interpretability vs Accuracy
 
 ---
 
@@ -231,6 +228,13 @@ Massive number of parameters from high-level layers (MNIST: 407k, CIFAR10: 890k)
 ---
 
 ## Dropout Techniques
+
+---
+
+## Machine Learning
+
+Inference vs Prediction
+- Or: Interpretability vs Accuracy
 
 ---
 
