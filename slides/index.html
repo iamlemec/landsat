@@ -219,15 +219,29 @@ $$
 
 The primary feature of CNNs is that they exploit translational symmetry at small spatial scales.
 
-Massive number of parameters from high-level layers (MNIST: 407k, CIFAR10: 890k)
+Image is reduced with successive steps of convolution and pooling, then finally classified with a dense network.
 
 ---
 
 ## Complexity and Overfitting
 
+Massive number of parameters from high-level layers (MNIST: 407k, CIFAR10: 890k)
+- even with millions of obervations, we run the risk of overfitting
+
+Classical ML technique for preventing overfitting is to separate out a fraction (say 20%) of the data as a validation set
+- don't train on this, just test predictions afterwards
+
+If validation error starts rising, we are probably overfitting
+
 ---
 
 ## Dropout Techniques
+
+Srivastava et al (2014) proposed a revolutionary method for preventing overfitting: **dropout** randomly severs connections in the network while training
+
+![Dropout](images/dropout.png)
+<p style="text-align: center; font-size: 20px; font-style: italic; padding: 0px;">Source: Srivastava et al (2014)</p>
+
 
 ---
 
@@ -235,6 +249,8 @@ Massive number of parameters from high-level layers (MNIST: 407k, CIFAR10: 890k)
 
 Inference vs Prediction
 - Or: Interpretability vs Accuracy
+
+![Accuracy vs Interpretability](images/accuracy_interpret.)
 
 ---
 
@@ -246,6 +262,10 @@ Engstrom, Hersh, and Newhouse (2017): predicting poverty and consumption levels 
 ---
 
 ## Data Sources
+
+---
+
+## Computational Tools
 
 ---
 
