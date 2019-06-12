@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<title>Firm Clustering</title>
+
+<meta name="description" content="Firm Clustering">
+<meta name="author" content="Douglas Hanley">
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<link rel="stylesheet" href="/reveal.js/css/reveal.css">
+<link rel="stylesheet" href="/reveal.js/css/theme/white.css" id="theme">
+
+<!-- For syntax highlighting -->
+<link rel="stylesheet" href="/reveal.js/lib/css/zenburn.css">
+
+<!-- local lecture style -->
+<link rel="stylesheet" href="index.css">
+
+<script>
+if (window.location.search.match(/print-pdf/gi)) {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = '/reveal.js/css/print/pdf.css';
+    document.getElementsByTagName('head')[0].appendChild(link);
+}
+</script>
+
+<style>
+.reveal .slides img[alt=sample_freqs] {
+    width: 90%;
+}
+.reveal .slides img[alt=results] {
+    width: 90%;
+}
+.reveal .slides img[alt=windows] {
+    width: 100%;
+}
+</style>
+
+<!--[if lt IE 9]>
+<script src="revealjs/lib/js/html5shiv.js"></script>
+<![endif]-->
+
+</head>
+
+<body>
+
+<div class="reveal">
+
+<div class="slides">
+
+<section data-markdown data-separator="^---$">
+<script type="text/template">
+# Spatial Clustering of Firms:
+# A Machine Learning Approach
+
+<br/><br/>
+
+##### Douglas Hanley (Pitt)
+##### Chengying Luo (Pitt → Happy Elements)
+##### Mingqin Wu (SCNU)
+
+<br/><br/>
+
+### SCNU 2019
+
+---
+
+## Firm Geography
+
+How does the spatial arrangement of firms affect productivity?
+
+What new tools can we use to approach this question?
+
+What can these results tell us about the role of cities in production?
+
+---
+
+## Density Measures
+
+Traditional methods have used density as a sufficient stastic
+- pro: can be run at higher levels of aggregation (city, county, etc)
+- con: requires an arbitrary definition of geographic unit
+
+This can be improved by using an **effective** firm density (adding empty land has no effect)
+$$
+\frac{\int_A \rho(x) dx}{\int_A dx}
+\quad \longrightarrow \quad
+\frac{\int_A \rho^2(x) dx}{\int_A dx}
+$$
+
+---
+
+## Higher Dimensionality
+
+Duranton and Overman (2005) employ a **two-point correlation function** to measure what they call localization
+- this is simply the density of distances between pairs of firms (popular in astrophysics)
+
+They focus on heterogeneity across industries: each industry has a characteristic distance scale between firms
+
+This (rightly?) compresses radial symmetry (anisitropy) but still throws away a lot of useful information
+
+---
+
+## Information Loss
+
+![Simulated Density](images/simulated_scatter.svg) <!-- .element style="width: 80%;" -->
+![Simulated Two-point](images/simulated_twopoint.svg) <!-- .element style="width: 80%;" -->
+
+---
+
+## Multiple Poles
+
+![Duranton-Overman Pharmaceuticals](images/duranton_combined.png) <!-- .element style="width: 100%;" -->
+
+Distributions for pharmaceuticals (left) and textile machinery (right). Pharma is clearly unipolar, while textiles has at least two clusters
+
+---
+
+## Maps and Information
+
+In general, we find that maps are extremely high dimensional objects, but how can we handle this in an economic setting?
+
+---
+
+## Machine Vision
+
+This is a powerful set of tools developed primarily for image classificiation tasks
+
+The canonical example is that of classifying pictures of hand-written digits (0—9) into their corresponding number
+- users include post offices, banks, etc
+- major training datasets include MNIST and CIFAR
+
+---
+
+## Digit Classifier (MNIST)
+
+![MNIST Classifier](images/mnist_classify.png)
+
+---
+
+## Image Classifier (CIFAR-10)
+
+![CIFAR-10 Classifier](images/cifar_classify.png)
+
+---
+
+## Application to Maps
+
+We can apply these to maps by rasterizing their continuous density into a grid of pixels
+- this is essentially a 2D binned histogram
+
+[example image]
+
+Instead of classifying them into digits, we instead want to predict other properties of firms represented therein (like productivity or growth)
+
+---
+
+## Machine Learning
+
+Inference vs Prediction
+- Or: Interpretability vs Accuracy
+
+---
+
+## Neural Networks
+
+---
+
+## Cell Activation Zoo
+
+Multinomial probabilities (softmax)
+$$
+y = W \cdot x + b \quad \rightarrow \quad p_k = \frac{\exp(y_k)}{\sum_{k^{\prime}}\exp(y_{k^{\prime}})}
+$$
+
+Rectified linear unit (relu)
+`$$
+y = \max \left\{ 0 , W \cdot x + b \right\}
+$$`
+
+Sign activation (tanh)
+
+$$
+y = \tanh \left( W \cdot x + b \right)
+$$
+
+---
+
+## Activation Functions
+
+---
+
+## Convolutional Networks
+
+![Typical CNN Architecture](images/typical_cnn_architecture.png) <!-- .element class="wide" -->
+<p style="text-align: center; font-size: 20px; font-style: italic; padding: 0px;">Source: Elite Data Science</p>
+
+The primary feature of CNNs is that they exploit translational symmetry at small spatial scales.
+
+Massive number of parameters from high-level layers (MNIST: 407k, CIFAR10: 890k)
+
+---
+
+## Complexity and Overfitting
+
+---
+
+## Dropout Techniques
+
+---
+
+## Existing Literature
+
+Hersh - GDP prediction in Sri Lanka
+
+---
+
+## Data Sources
+
+---
+
+## City Structure
+
+![Density Overlay](images/density_overlay.svg) <!-- .element class="full" -->
+
+Xi'an and Shanghai clearly have different scale and density, but also different types of clustering (Xi'an Hi-Tech Zone in southwest)
+
+---
+
+## Density Maps
+
+---
+
+## Network Structure
+
+---
+
+
+
+</script>
+</section>
+
+</div>
+
+</div>
+
+<script src="/reveal.js/lib/js/head.min.js" type="text/javascript"></script>
+<script src="/reveal.js/js/reveal.js" type="text/javascript"></script>
+
+<script>
+
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+  controls: false,
+  progress: true,
+  history: true,
+  center: false,
+  slideNumber: true,
+  width: 800,
+  minScale: 0.1,
+
+  transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
+
+  // Parallax scrolling
+  // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+  // parallaxBackgroundSize: '2100px 900px',
+
+  math: {
+      // mathjax: 'http://cdn.mathjax.org/mathjax/latest/MathJax.js',
+      mathjax: '/MathJax/MathJax.js',
+      config: 'TeX-AMS_HTML-full'
+  },
+
+  // Optional libraries used to extend on reveal.js
+  dependencies: [
+    { src: '/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+    { src: '/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+    { src: '/reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+    { src: '/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+    { src: '/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+    { src: '/reveal.js/plugin/math/math.js', async: true }
+  ]
+});
+
+</script>
+
+</body>
+
+</html>

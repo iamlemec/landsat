@@ -1,0 +1,195 @@
+/*
+@import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+@import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+*/
+
+.reveal p, .reveal li, .reveal table {
+  font-family: 'Droid Serif';
+  font-size: 28px;
+}
+
+.reveal p {
+  padding-top: 20px;
+}
+
+.reveal ul {
+  padding-left: 40px;
+}
+
+.reveal ul li {
+  margin-top: 0px;
+}
+
+.reveal .slides {
+    text-align: left;
+}
+
+.reveal .slides section>* {
+    /*margin-left: 0;*/
+    /*margin-right: 0;*/
+}
+
+.reveal .slides img {
+  text-align: center;
+  margin: auto;
+  width: 100%;
+}
+
+.reveal h1 {
+  font-size: 45px;
+}
+
+.reveal h2 {
+  font-size: 45px;
+}
+
+.reveal h3 {
+  font-size: 40px;
+} 
+
+.reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+  font-family: 'Yanone Kaffeesatz';
+  font-weight: normal;
+  text-transform: none;
+}
+
+.reveal {
+  font-family: 'Ubuntu Mono';
+}
+
+.reveal li {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.reveal div.MathJax_Display {
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+.reveal img.noborder {
+  border: none;
+}
+
+.reveal .slides img {
+  /* border: 20px solid white; */
+  border: none;
+  box-shadow: none;
+  width: 70%;
+  display: block;
+  margin: auto;
+}
+
+.reveal .slides img.wide {
+  width: 80%;
+}
+
+.reveal .slides img.full {
+  width: 100%;
+}
+
+.reveal table td {
+  border: none;
+}
+
+.reveal .tight {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.reveal table {
+  font-size: 25px;
+  padding: 0;
+  border-spacing: 0;
+  /*border-collapse: separate;*/
+  margin: auto;
+}
+
+.reveal table thead tr th {
+  border-bottom: 2px solid black;
+}
+
+.reveal table tbody tr {
+  background-color: white;
+  margin: 0;
+  padding: 0;
+}
+
+.reveal table tr:nth-child(2n) {
+  background-color: #f0f0f0;
+}
+
+.reveal table tr th {
+  text-align: center;
+  font-weight: bold;
+  margin: 0;
+  padding: 6px 13px;
+}
+
+.reveal table tr td {
+  text-align: center;
+  margin: 0;
+  padding: 6px 13px;
+}
+
+.reveal table tr td:first-child {
+  text-align: left;
+}
+
+/*********************************************
+ * NAVIGATION CONTROLS
+ *********************************************/
+
+.reveal .controls div.navigate-left, .reveal .controls div.navigate-left.enabled {
+  border-right-color: #13DAEC; }
+
+.reveal .controls div.navigate-right, .reveal .controls div.navigate-right.enabled {
+  border-left-color: #13DAEC; }
+
+.reveal .controls div.navigate-up, .reveal .controls div.navigate-up.enabled {
+  border-bottom-color: #13DAEC; }
+
+.reveal .controls div.navigate-down, .reveal .controls div.navigate-down.enabled {
+  border-top-color: #13DAEC; }
+
+.reveal .controls div.navigate-left.enabled:hover {
+  border-right-color: #71ebf4; }
+
+.reveal .controls div.navigate-right.enabled:hover {
+  border-left-color: #71ebf4; }
+
+.reveal .controls div.navigate-up.enabled:hover {
+  border-bottom-color: #71ebf4; }
+
+.reveal .controls div.navigate-down.enabled:hover {
+  border-top-color: #71ebf4; }
+
+/*********************************************
+ * PROGRESS BAR
+ *********************************************/
+
+.reveal .progress {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.reveal .progress span {
+  background: #42a5f5;
+  -webkit-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+  -moz-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+  transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+}
+
+/*********************************************
+ * SLIDE NUMBER
+ *********************************************/
+
+.reveal .slide-number {
+  background: white;
+  color: black;
+}
+
+/* custom */
+table.reg-table > tbody > tr:last-child {
+  background-color: rgba(53, 122, 232, 0.4);
+}
