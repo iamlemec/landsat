@@ -174,13 +174,32 @@ Inference vs Prediction
 
 ## Neural Networks
 
+Neural networks (NN) consist of a network of cells, each of which performs a simple operation on the data
+
+![Neural Network](images/neural_network.jpg)
+<p style="text-align: center; font-size: 20px; font-style: italic; padding: 0px;">Source: Towards Data Science</p>
+
+---
+
+## Network Cells
+
+Inputs ("X data") are fed in and through the network to generate outputs ("Y data")
+
+Each cell applies an "activation function" ($F$) to a linear sum of its inputs
+$$
+y = F\left( W \cdot x + b \right)
+$$
+
+Training a network involves choosing parameters ($W$ and $b$) to minimize an objective function
+- mean-squared error for real value data or categorical cross-entry for categorical data
+
 ---
 
 ## Cell Activation Zoo
 
 Multinomial probabilities (softmax)
 $$
-y = W \cdot x + b \quad \rightarrow \quad p_k = \frac{\exp(y_k)}{\sum_{k^{\prime}}\exp(y_{k^{\prime}})}
+z = W \cdot x + b \quad \rightarrow \quad y_k = \frac{\exp(z_k)}{\sum_{k^{\prime}}\exp(z_{k^{\prime}})}
 $$
 
 Rectified linear unit (relu)
@@ -193,10 +212,6 @@ Sign activation (tanh)
 $$
 y = \tanh \left( W \cdot x + b \right)
 $$
-
----
-
-## Activation Functions
 
 ---
 
@@ -221,7 +236,8 @@ Massive number of parameters from high-level layers (MNIST: 407k, CIFAR10: 890k)
 
 ## Existing Literature
 
-Hersh - GDP prediction in Sri Lanka
+Engstrom, Hersh, and Newhouse (2017): predicting poverty and consumption levels in Sri Lanka from satellite imagery
+- not end-to-end: use ML to extract features like cars and buildings, then feed into regression analysis
 
 ---
 
