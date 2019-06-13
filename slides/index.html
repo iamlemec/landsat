@@ -85,7 +85,7 @@ What can these results tell us about the role of cities in production?
 
 → We propose a method that utilizes advances in machine learning related to image classification
 
-→ This imposes minimal assumptions and minimizes the loss of information
+→ This imposes fewer assumptions and minimizes the loss of information
 
 ---
 
@@ -270,6 +270,8 @@ In the high accuracy regime of neural networks, understanding mechanism of "blac
 Engstrom, Hersh, and Newhouse (2017): predicting poverty and consumption levels in Sri Lanka from satellite imagery
 - not end-to-end: use ML to extract features like cars and buildings, then feed into regression analysis
 
+Large literature using night time lights (NTL) to predict poverty and GDP using traditional techniques (Henderson, Storeygard, and Weil, 2012)
+
 ---
 
 ## Data Sources
@@ -305,7 +307,27 @@ Final output is 256x256 monochrome 8-bit JPEG image file for each firm (1.4 mill
 
 ---
 
+## Classical Method
+
+Using the same density maps, we can aggregate into concentric rings: 0-2km, 2-4km, 4-8km
+$$
+\log(p_i) \sim 1 + d_{0-2} + d_{2-4} + d_{4-8}
+$$
+
+Coefficients for $d_{0-2}$ and $d_{2-4}$ are insignificant, while $d_{4-8}$ is significant and positive
+
+| Variable  | Coefficient | Std Err | P-value |
+|-----------|-------------|---------|---------|
+| 1         | 4.29        | 0.01    | 0.00    |
+| $d_{0-2}$ | -6.09       | 37.4    | 0.87    |
+| $d_{2-4}$ | 14.2        | 24.2    | 0.56    |
+| $d_{4-8}$ | 11.7        | 5.38    | 0.03**  |
+
+---
+
 ## Classical Results
+
+Results have low predictive power and show little variation across true productivity bins
 
 ![Classical Results](images/ols_results.png) <!-- .element class="full" -->
 
@@ -348,7 +370,7 @@ Only need to specify objective (categorical cross entry) and optimizer (gradient
 
 ## CNN Results
 
-Same objective as classical case (log productivity) using mean squared error as the objectiv and the `adam` optimizer for 25 epochs
+Same objective as classical case (log productivity) using mean squared error as the objective and the `adam` optimizer for 25 epochs
 
 ![CNN Results](images/cnn_results_train.png) <!-- .element class="full" -->
 
@@ -372,6 +394,10 @@ To bridge the gap between classical (OLS) and CNN, we can look at a simple radia
 
 ## Impulse Responses
 
+To understand effect of spatial clustering, we take each original firm and add in new firms artificially, then plot change in log productivity (average is ~0.5)
+
+![Impulse Reponse](images/impulse_response.png) <!-- .element style="width: 50%;" -->
+
 ---
 
 ## Endogeneity Issues
@@ -387,7 +413,9 @@ In terms of observable characteristics, there are two approaches
 
 ## Residual Productivity
 
-![Residual Distribution](images/residual_distribution.png) <!-- .element style="width: 60%;" -->
+Partialling out fixed effects from industry code (4-digit) still leaves a substantial amount of correlated variation
+
+![Residual Distribution](images/residual_distribution.png) <!-- .element style="width: 50%;" -->
 
 ---
 
