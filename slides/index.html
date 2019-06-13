@@ -83,6 +83,10 @@ What new tools can we use to approach this question?
 
 What can these results tell us about the role of cities in production?
 
+→ We propose a method that utilizes advances in machine learning related to image classification
+
+→ This imposes minimal assumptions and minimizes the loss of information
+
 ---
 
 ## Density Measures
@@ -205,10 +209,17 @@ y = \max \left\{ 0 , W \cdot x + b \right\}
 $$`
 
 Sign activation (tanh)
-
 $$
 y = \tanh \left( W \cdot x + b \right)
 $$
+
+---
+
+## Convolution Cell
+
+These aggregate local information and can detect small features line a border or a corner
+
+[example image]
 
 ---
 
@@ -230,8 +241,7 @@ Massive number of parameters from high-level layers (MNIST: 407k, CIFAR10: 890k)
 
 Classical ML technique for preventing overfitting is to separate out a fraction (say 20%) of the data as a validation set
 - don't train on this, just test predictions afterwards
-
-If validation error starts rising, we are probably overfitting
+- if validation error starts rising, we are probably overfitting
 
 ---
 
@@ -242,15 +252,14 @@ Srivastava et al (2014) proposed a revolutionary method for preventing overfitti
 ![Dropout](images/dropout.png)
 <p style="text-align: center; font-size: 20px; font-style: italic; padding: 0px;">Source: Srivastava et al (2014)</p>
 
-
 ---
 
-## Machine Learning
+## Algorithmic Tradeoff
 
-Inference vs Prediction
-- Or: Interpretability vs Accuracy
+In the high accuracy regime of neural networks, understanding mechanism of "black box" is difficult
 
-![Accuracy vs Interpretability](images/accuracy_interpret.)
+![Accuracy vs Interpretability](images/accuracy_interpret.png)
+<p style="text-align: center; font-size: 20px; font-style: italic; padding: 0px;">Source: Towards Data Science</p>
 
 ---
 
@@ -263,9 +272,15 @@ Engstrom, Hersh, and Newhouse (2017): predicting poverty and consumption levels 
 
 ## Data Sources
 
----
+Economic Census (NBS) of Chinese firms in the year 2004
+- includes both manufacturing and services
+- roughly 1.4 million firms in total
 
-## Computational Tools
+Firm level fields available
+- street address → geo coordinates using Baidu API
+- categorical data: industry code and province
+- balance sheet info: income, assets, employees
+- currently unused: age and firm type
 
 ---
 
@@ -279,13 +294,103 @@ Xi'an and Shanghai clearly have different scale and density, but also different 
 
 ## Density Maps
 
+The density map is firm specific: it is the density map centered on the firm for a given radius
+- we use both 2km and 8km radii with 256 pixels
+- due to measurement error, we add blurr of ~30m
+
+Final output is 256x256 monochrome 8-bit JPEG image file for each firm (1.4 million) and each radius
+![Density Example](images/density_example.png) <!-- .element class="full" -->
+
 ---
 
-## Network Structure
+## Classical Results
 
 ---
 
 
+## Computational Tools
+
+Recent renaissance of machine learning tools: Tensorflow (Google) and Torch (Facebook)
+- higher level APIs such as Keras make network construction simple
+
+```
+model = keras.models.Sequential([
+ 	keras.layers.Flatten(input_shape=(28, 28)),
+ 	keras.layers.Dense(512, activation=tf.nn.relu),
+ 	keras.layers.Dropout(0.2),
+ 	keras.layers.Dense(10, activation=tf.nn.softmax)
+])
+```
+
+Only need to specify objective (categorical cross entry) and optimizer (gradient, adam, etc) and ready to train
+
+---
+
+## CNN Network Structure
+
+`$$\begin{array}{c}
+\text{Input Image [256x256]} \\
+\downarrow \\
+\text{Convolution + Max Pooling [32x32]} \\
+\downarrow \\
+\text{Convolution + Max Pooling [8x8]} \\
+\downarrow \\
+\text{Dense Layer [64]} \\
+\downarrow \\
+\text{Output [1]}
+\end{array}$$`
+
+---
+
+## CNN Results
+
+---
+
+## Intermediate Results
+
+---
+
+## Impulse Responses
+
+---
+
+## Endogeneity Issues
+
+Up to now, we focused on prediction, but in terms of inference there is an endogeneity issue
+- there are potential confounders, firm location choice is endogenous
+
+In terms of observable characteristics, there are two approaches
+1. partial out industry/province fixed effects and predict residual
+2. feed additional firm features directly into neural network
+
+---
+
+## Residual Productivity
+
+---
+
+## Intrumental Variables
+
+Here we can adapt a standard instrumental variables approach as well
+- two steps: prediction and inference
+
+Example instrument: distance to ancient provincial capital
+- prediction: estimate mapping from distance to density map
+- inference: use predicted density map as input into productivity
+
+---
+
+## Additional Inputs
+
+Currently we use only the density map of firms at various radii
+- worker density (weighted by employee count)
+- only within industry (or weighted upstream/downstream)
+
+Satellite imagery or other maps to explicitly account for features like hills, mountains, rivers, etc.
+
+---
+
+## Future Work
 
 </script>
 </section>

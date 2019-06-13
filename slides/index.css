@@ -137,6 +137,12 @@
   text-align: left;
 }
 
+.reveal .slides pre {
+  margin-left: 5px;
+  margin-right: 5px;
+  font-size: 20px;
+}
+
 /*********************************************
  * NAVIGATION CONTROLS
  *********************************************/
