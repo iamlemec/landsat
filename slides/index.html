@@ -218,8 +218,10 @@ $$
 ## Convolution Cell
 
 These aggregate local information and can detect small features line a border or a corner
+- examples include blurring (averaging), contrast, flow, etc
 
-[example image]
+![Convolution Matrix](images/convolution_matrix.png) <!-- .element class="wide" -->
+<p style="text-align: center; font-size: 20px; font-style: italic; padding: 0px;">Source: Designing What's Next</p>
 
 ---
 
@@ -305,6 +307,8 @@ Final output is 256x256 monochrome 8-bit JPEG image file for each firm (1.4 mill
 
 ## Classical Results
 
+![Classical Results](images/ols_results.png) <!-- .element class="full" -->
+
 ---
 
 
@@ -344,9 +348,25 @@ Only need to specify objective (categorical cross entry) and optimizer (gradient
 
 ## CNN Results
 
+Same objective as classical case (log productivity) using mean squared error as the objectiv and the `adam` optimizer for 25 epochs
+
+![CNN Results](images/cnn_results_train.png) <!-- .element class="full" -->
+
+---
+
+## CNN Validation
+
+Inspecting validation numbers reveals a sustained effect but also some overfitting
+
+![CNN Results](images/cnn_results_valid.png) <!-- .element class="full" -->
+
 ---
 
 ## Intermediate Results
+
+To bridge the gap between classical (OLS) and CNN, we can look at a simple radial model (where the radius is trained rather than fixed). This appears to have little predictive power.
+
+![Radial Results](images/radial_results.png) <!-- .element class="full" -->
 
 ---
 
@@ -366,6 +386,15 @@ In terms of observable characteristics, there are two approaches
 ---
 
 ## Residual Productivity
+
+![Residual Distribution](images/residual_distribution.png) <!-- .element style="width: 60%;" -->
+
+---
+
+## Residual Results
+
+![Residual Results](images/resid_results_train.png)
+![Residual Results](images/resid_results_valid.png)
 
 ---
 
@@ -391,6 +420,10 @@ Satellite imagery or other maps to explicitly account for features like hills, m
 ---
 
 ## Future Work
+
+Use patent data from SIPO to understand the spatial clustering of innovation, which might be even more interesting
+
+Perform same analysis using US data and compare results. Does the differential structure of cities affect firm producitvity substantially?
 
 </script>
 </section>
