@@ -71,7 +71,7 @@ if (window.location.search.match(/print-pdf/gi)) {
 
 <br/><br/>
 
-### SCNU 2019
+### SED 2019
 
 ---
 
@@ -89,29 +89,22 @@ What can these results tell us about the role of cities in production?
 
 ---
 
-## Density Measures
+## Maps and Information
 
-Traditional methods have used density as a sufficient stastic
-- pro: can be run at higher levels of aggregation (city, county, etc)
-- con: requires an arbitrary definition of geographic unit
+In general, we find that maps are extremely high dimensional objects, but how can we handle this in an economic setting?
 
-This can be improved by using an **effective** firm density (adding empty land has no effect)
-$$
-\frac{\int_A \rho(x) dx}{\int_A dx}
-\quad \longrightarrow \quad
-\frac{\int_A \rho^2(x) dx}{\int_A dx}
-$$
+![Density Maps](images/density_map.png) <!-- .element class="full" -->
 
 ---
 
-## Characteristic Scale
+## Geographic Statistics
+
+**Density measures** give a good measure of average clustering but are boundary dependent
 
 Duranton and Overman (2005) employ a **two-point correlation function** to measure what they call localization
 - this is simply the density of distances between pairs of firms (popular in astrophysics)
 
-They focus on heterogeneity across industries: each industry has a characteristic distance scale between firms
-
-This (rightly?) compresses radial symmetry (anisitropy) but still throws away a lot of useful information
+This (rightly?) compresses radial symmetry (isotropy) but still throws away a lot of useful information
 
 ---
 
@@ -119,22 +112,6 @@ This (rightly?) compresses radial symmetry (anisitropy) but still throws away a 
 
 ![Simulated Density](images/simulated_scatter.svg) <!-- .element style="width: 80%;" -->
 ![Simulated Two-point](images/simulated_twopoint.svg) <!-- .element style="width: 80%;" -->
-
----
-
-## Multiple Poles
-
-![Duranton-Overman Pharmaceuticals](images/duranton_combined.png) <!-- .element style="width: 100%;" -->
-
-Distributions for pharmaceuticals (left) and textile machinery (right). Pharma is clearly unipolar, while textiles has at least two clusters
-
----
-
-## Maps and Information
-
-In general, we find that maps are extremely high dimensional objects, but how can we handle this in an economic setting?
-
-![Density Maps](images/density_map.png) <!-- .element class="full" -->
 
 ---
 
@@ -198,9 +175,9 @@ Training a network involves choosing parameters ($W$ and $b$) to minimize an obj
 
 ## Cell Activation Zoo
 
-Multinomial probabilities (softmax)
+Logistic unit (softmax)
 $$
-z = W \cdot x + b \quad \rightarrow \quad y_k = \frac{\exp(z_k)}{\sum_{k^{\prime}}\exp(z_{k^{\prime}})}
+y = \frac{1}{1+\exp(-(W \cdot x + b))}
 $$
 
 Rectified linear unit (relu)
@@ -288,25 +265,31 @@ Firm level fields available
 
 ---
 
-## Density Maps
+## City Structure
 
-The density map is firm specific: it is the density map centered on the firm for a given radius
-- we use both 2km and 8km radii with 256 pixels
-- due to measurement error, we add blurr of ~30m
+Rich heterogeneity in how cities are laid out
 
-Final output is 256x256 monochrome 8-bit JPEG image file for each firm (1.4 million) and each radius
-![Density Example](images/density_example.png) <!-- .element class="full" -->
+![Density Overlay](images/density_overlay.png) <!-- .element class="full" -->
+
+---
+
+## Firm Maps
+
+The density/satelite map is firm specific: it is centered on the firm for a given radius (2km or 8km, 256 pixels)
+
+![Density Example](images/density_examples.png) <!-- .element class="full" -->
+![Landsat Example](images/landsat_examples.png) <!-- .element class="full" -->
 
 ---
 
 ## Classical Method
 
 Using the same density maps, we can aggregate into concentric rings: 0-2km, 2-4km, 4-8km
-$$
+`$$
 \log(p_i) \sim 1 + d_{0-2} + d_{2-4} + d_{4-8}
-$$
+$$`
 
-Coefficients for $d_{0-2}$ and $d_{2-4}$ are insignificant, while $d_{4-8}$ is significant and positive
+Coefficients for `$d_{0-2}$` and `$d_{2-4}$` are insignificant, while `$d_{4-8}$` is significant and positive
 
 | Variable  | Coefficient | Std Err | P-value |
 |-----------|-------------|---------|---------|
@@ -344,7 +327,7 @@ Only need to specify objective (categorical cross entry) and optimizer (gradient
 
 ---
 
-## CNN Network Structure
+## CNN Structure (~100K params)
 
 `$$\begin{array}{c}
 \text{Input Image [256x256]} \\
@@ -420,12 +403,9 @@ Partialling out fixed effects from industry code (4-digit) still leaves a substa
 
 ## Intrumental Variables
 
-Here we can adapt a standard instrumental variables approach as well
-- two steps: prediction and inference
+Here we can adapt a standard instrumental variables approach (prediction + inference)
 
-Example instrument: distance to ancient provincial capital
-- prediction: estimate mapping from distance to density map
-- inference: use predicted density map as input into productivity
+![Instrumental Design](images/instrument_design.png) <!-- .element class="full" -->
 
 ---
 
