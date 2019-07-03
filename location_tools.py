@@ -139,7 +139,7 @@ def extract_satelite_tile(lon, lat, rad, pid=None, index=None, size=None, proj='
         return np.asarray(im)
 
 # firms is a (tag, lon, lat, prod) file. assumes WGS84 datum
-def extract_satelite_firm(firms, rad, size=256, resample=Image.LANCZOS, chan='B8', output='tiles/landsat', ext='jpg', overwrite=False):
+def extract_satelite_firm(firms, rad=[256, 1024], size=256, resample=Image.LANCZOS, chan='B8', output='tiles/landsat', ext='jpg', overwrite=False):
     if type(firms) is str:
         firms = pd.read_csv(firms)
     if type(rad) is int:
@@ -190,7 +190,7 @@ def extract_density_core(mat, px, py, rad, size=256, sigma=2, norm=300, image=Tr
     else:
         return den
 
-def extract_density_tile(lon, lat, density='density', rad=128, size=256, sigma=25, norm=300, proj='bd-09', image=True):
+def extract_density_tile(lon, lat, rad, density='density', size=256, sigma=25, norm=300, proj='bd-09', image=True):
     lon, lat = ensure_wgs(lon, lat, proj)
     utm_zone = wgs2utm(lon, lat)
     cells = pd.read_csv(f'{density}/utm_cells.csv', index_col='utm')
@@ -210,7 +210,7 @@ def extract_density_tile(lon, lat, density='density', rad=128, size=256, sigma=2
     return extract_density_core(mat, px, py, rad, size=size, sigma=psigma, norm=norm, image=image)
 
 # firms is a (id, lon, lat) filename or dataframe. assumes WGS84 datum
-def extract_density_firm(firms, rad, size=256, sigma=25, norm=300, overwrite=False, density='density', output='tiles/density', ext='jpg', log=True):
+def extract_density_firm(firms, rad=[256, 1024], size=256, sigma=25, norm=300, overwrite=False, density='density', output='tiles/density', ext='jpg', log=True):
     if type(firms) is str:
         firms = pd.read_csv(firms)
     if type(rad) is int:
