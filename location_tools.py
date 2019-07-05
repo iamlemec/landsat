@@ -95,7 +95,7 @@ def load_scene(pid, chan='B8'):
 # find scenes corresponding. data is (id, lon, lat) list
 def index_firm_scenes(firms, fout, index):
     if type(firms) is str:
-        firms = pd.read_csv(firms)[['id', 'lon_bd09', 'lat_bd09']].dropna()
+        firms = pd.read_csv(firms, usecols=['id', 'lon_bd09', 'lat_bd09']).dropna()
     if type(index) is str:
         index = load_index(index)
     scene = lambda lon, lat: find_scene(lon, lat, index)
