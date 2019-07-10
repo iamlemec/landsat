@@ -1,0 +1,53 @@
+\documentclass[12pt]{article}
+\usepackage{setspace}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[utf8]{inputenc}
+\usepackage{parskip}
+\usepackage{graphicx}
+\usepackage[colorlinks = true,
+            linkcolor = blue,
+            urlcolor  = black,
+            citecolor = blue,
+            anchorcolor = blue]{hyperref}\usepackage{cleveref}
+\usepackage{listings}
+\usepackage{bibentry}
+% \usepackage{bbm}
+\usepackage[top=1.2in,bottom=1.2in,left=1in,right=1in]{geometry}
+\usepackage{caption}
+\usepackage{subcaption}
+\Crefformat{equation}{#2Equation~#1#3}
+\usepackage{natbib}
+\setcitestyle{authoryear,open={(},close={)}}
+% \usepackage{bigstrut}
+% \usepackage{multirow}
+\usepackage{booktabs}
+% \usepackage[version=4]{mhchem}
+
+\bibliographystyle{apalike}
+\setlength{\parindent}{0.5cm}
+\setlength{\parskip}{0cm}
+\renewcommand{\baselinestretch}{1.1}
+
+\begin{document}
+\section*{Clustering Indexes}
+Firms tend to cluster near one another. Studies on the relationship between geographic concentration and firm growth require an accurate measure of firm location patterns.  \cite{ellison1997geographic} using discrete spatial units like states to measure the location patterns of industries across regions. Discrete spatial units that capture relevant regional markets offer a reasonable starting point for understanding location patterns. \cite{maurel1999measure} and \cite{devereux2004geographic} develop alternative indices of localization taking similar approach. However, indices like \cite{ellison1997geographic} are always sensitive to the choice of regional boundaries, e.g., counties, cities or states. Outcomes
+may vary to a large degree when changing from
+one aggregation level to another. Furthermore,
+spatial divisions normally do not depend on economic characteristics but on administrative classifications.
+
+
+\cite{duranton2005testing} instead proposes analyzing spatial clustering using distance-based methods that do not discretize an area into spatial subunits but see it as a continuous space. Distance-based methods have a more longstanding tradition in disciplines such as forestry or astronomy but have rarely been used for spatial economics. This is mainly due to standard distance-based methods compare a point pattern with a theoretical topographic concentration, generally using a spatial Poisson process. However, in economics, this comparison is not meaningful since firms cannot settle anywhere. Locations of firms are highly restricted due to planning regularities, accessibility, and properties of the surface (mountains, lakes, swamps, etc.). To overcome the shortcomings of topographic measures, \cite{duranton2005testing} measure the spatial concentration of industry relative to the overall localization of firms in the area under investigation.
+A growing literature has applied this measure in understanding motivation for agglomeration (\citeauthor{ellison2010causes}, \citeyear{ellison2010causes}; \citeauthor{alfaro2014global}, \citeyear{alfaro2014global}). However, the use of the usage of this distance-based methods is not only limited by its high demand for spatially fine-grained data and computation but also not being able to measure the relative localization of individual firms.
+
+Concerning this situation, our proposed measure aims to present a new firm-level Cluster Index that belongs to the class of distance-based methods but which differs both in its calculation and its interpretation from the existing \cite{duranton2005testing} metrics. Three properties enable the metric’s meaningful use for cluster analysis:
+
+1. The index reveals the spatial location of highly clustered firms and thus gives insight into both the spatial dimension and the position of firm clusters.
+
+2. The metric computes a unique degree of concentration for each firm. This allows us to run regression or correlation analysis with other firm-plant-specific properties such as growth levels or patent activity.
+
+3. Less computationally demanding. (\textbf{Doug, can you please fill in here. Convolution Method})
+
+\bibliography{literature}
+
+\end{document}
