@@ -1,0 +1,89 @@
+chinese,english
+法人代码,Corporate code
+法人单位,legal entity
+法人代表姓名,Legal representative name
+地址,Address
+省地县码,Province and county code
+省市,Province
+电话号码,Phone number
+邮件地址,Email address
+邮政编码,Postal code
+产品1,Product 1
+产品2,Product 2
+产品3,Product 3
+行业类别,industry category
+注册类型,Registration Type
+国有控股,State-owned holding
+隶属关系,Affiliation
+开业时间（年）,Opening time (year)
+开业时间（月）,Opening time (month)
+营业状态,Business status
+产业活动单位数,Number of industrial activities
+工业,industry
+轻重工业,Light and heavy industry
+企业规模,Business size
+工业总产值（不变价）,Gross industrial output (constant price)
+工业总产值（现价）,Gross industrial output (current price)
+新产品产值,New product output value
+工业销售产值,Industrial sales value
+出口交货值,Export delivery value
+从业人数,Number of employees
+工业增加值,Industrial added value
+流动资产合计,Total current assets
+应收帐款,Accounts receivable
+存货,stock
+产成品,Finished product
+流动资产年平均余额,Annual average balance of current assets
+长期投资,Long-term investment
+固定资产合计,Total fixed assets
+固定投资原价合计,The original value of fixed investment is total
+生产经营用,Production and operation
+累计折旧,Accumulated depreciation
+本年折旧,Depreciation this year
+固定资产净值年平均余额,Annual average balance of net fixed assets
+无形资产,Intangible assets
+资产总计,total assets
+流动负债合计,Total current liabilities
+长期负债合计,Total long-term liabilities
+负债合计,Total Liabilities
+权益合计,Total equity
+实收资本,Paid-in capital
+国家资本金,State capital
+集体资本金,Collective capital
+法人资本金,Corporate capital
+个人资本金,Personal capital
+港澳台资本,Hong Kong, Macao and Taiwan capital
+外商资本金,Foreign capital
+产品销售收入,Product sales revenue
+产品销售成本,Product sales cost
+产品销售费用,Product sales expenses
+产品税金及附加,Product taxes and surcharges
+其他业务利润,Other business profits
+管理费用,Management costs
+税金,Tax
+财产保险费,Property insurance premium
+劳动、待业保险费,Labor, unemployment insurance
+财务费用,Financial expenses
+利息支出,Interest expense
+营业利润,operating profit
+补贴收入,Subsidy income
+利润总额,Total profit
+亏损总额,Total loss
+利税总额,Total profit and tax
+应交所得税,Income tax should be paid
+本年应付工资总额,The total amount of wages payable this year
+主营业务应该工资总额,The main business should be the total amount of wages
+本年应付福利费,The welfare payable this year
+主营业务应付福利费,Main business payable welfare fee
+本年应交增值税,VAT should be paid this year.
+本年进项税额,The amount of input tax this year
+本年销项税额,The amount of output tax this year
+工业中间投入合计,Industrial intermediate inputs
+地址代码,Address code
+Province_No,Province_No
+Province,Province
+行政区划代码,Administrative division code
+行政区划名称,Administrative division name
+id,id
+lon_bd09,lon_bd09
+lat_bd09,lat_bd09

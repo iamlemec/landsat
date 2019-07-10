@@ -1,0 +1,179 @@
+chinese,english
+id,Id
+法人代码,Corporate code
+单位名称,company name
+法定代表人,Legal representative
+省市县码,Province, city and county code
+B05,B05
+省自治区直辖市,State / Province / State
+地区市州盟,Regional city state alliance
+县区市旗,County and city flags
+乡镇,Township
+社区居委会村委会,Community Neighborhood Committee Village Committee
+街村门牌号,Street village number
+街道办事处,Street office
+分机号,Ext
+区号,Area code
+电话号码,telephone number
+传真号码,fax number
+邮政编码,Postal code
+电子邮箱,E-mail
+网址,URL
+主要业务活动或主要产品1,Main business activities or major products 1
+主要业务活动或主要产品2,Main business activities or major products 2
+主要业务活动或主要产品3,Main business activities or major products 3
+行业代码,Industry code
+var24,Var24
+工商登记注册号,Business registration number
+var26,Var26
+var27,Var27
+编制登记注册号,Prepare a registration number
+社团登记注册号,Community registration number
+var30,Var30
+其他请注明批准机关,Please indicate the approval authority
+机关级别1,Organ level 1
+机关级别2,Authority level 2
+机关级别3,Organ level 3
+国有控股情况,State-owned holdings
+机关级别4,Organ level 4
+登记注册类型,Registration Type
+隶属关系,Affiliation
+var39,Var39
+var40,Var40
+营业状态,Business status
+执行会计制度类别,Implement the accounting system category
+机构类型,Organization Type
+产业活动单位数总计,Total number of industrial activity units
+农林牧渔业,Agriculture, forestry, animal husbandry and fishery
+交通运输电信业,Transportation telecommunications industry
+工业,industry
+建筑业,Construction industry
+批发零售业,Wholesale and retail trade
+住宿餐饮业,Accommodation and catering industry
+房地产业,Real estate industry
+其他,other
+年末从业人员合计_总计,Total employees at the end of the year_total
+年末从业人员合计_女性,At the end of the year, the total number of employees is _ female
+全年营业收入合计,Total annual operating income
+企业单位数,Number of business units
+var57,Var57
+资产总计,total assets
+亏损企业单位数,Number of loss-making business units
+工业总产值当年价格,The total industrial output value of the current year
+其中新产品产值,Among them, the output value of new products
+工业销售产值当年价格,Industrial sales value of the current year
+出口交货值,Export delivery value
+全部从业人员年平均人数,The average number of employees in the industry
+其中短期投资,Among them, short-term investment
+工业增加值,Industrial added value
+流动资产合计,Total current assets
+应收帐款,Accounts receivable
+存货,stock
+其中产成品,Among them, finished products
+固定资产合计,Total fixed assets
+流动资产年平均余额,Annual average balance of current assets
+长期投资,Long-term investment
+固定资产原价,Fixed Assets
+其中生产经营用,Among them, production and operation
+累计折旧,Accumulated depreciation
+其中本年折旧,Which is depreciated this year
+固定资产净值年平均余额,Annual average balance of net fixed assets
+无形资产,Intangible assets
+资产总计318,Total assets 318
+流动负债合计,Total current liabilities
+其中应付帐款,Among them, accounts payable
+长期负债合计,Total long-term liabilities
+负债合计,Total Liabilities
+所有者权益合计,Total owner's equity
+其中实收资本,Among the paid-in capital
+国家资本金,State capital
+集体资本金,Collective capital
+法人资本金,Corporate capital
+个人资本金,Personal capital
+港澳台资本,Hong Kong, Macao and Taiwan capital
+外商资本金,Foreign capital
+主营业务收入,Main business income
+主营业务成本,Main business cost
+主营业务税金及附加,The main business tax and surcharges
+其他业务收入,Other operating income
+其他业务利润,Other business profits
+营业费用,Operating expenses
+管理费用,Management costs
+其中税金,Which taxes
+财产保险费,Property insurance premium
+办公费,Office fee
+其中利息支出,Of which interest expenses
+职工教育费,Staff education fees
+财务费用,Financial expenses
+营业利润,operating profit
+投资收益,Investment income
+补贴收入,Subsidy income
+营业外收入,Non-operating income
+利润总额,Total profit
+亏损总额,Total loss
+利税总额,Total profits and taxes
+应交所得税,Income tax should be paid
+广告费,advertising fee
+研究开发费,Research and development expenses
+劳动失业保险费,Labor unemployment insurance premium
+养老保险和医疗保险费,Endowment insurance and medical insurance premiums
+住房公积金和住房补贴,Housing provident fund and housing subsidies
+var119,Var119
+其中主营业务应付工资总额,Wages of which the main business
+var121,Var121
+其中主营业务应付福利费总额,Which the main business cope with the total welfare
+本年应交增值税,VAT this year
+工业中间投入合计,Industrial intermediate inputs together
+本年进项税额,The amount of input tax this year
+本年销项税额,The amount of output tax this year
+其中直接材料,Among the direct materials
+制造费用中的中间投入,Intermediate investment in manufacturing costs
+管理费用中的中间投入,Intermediate investment in management costs
+营业费用中的中间投入,Intermediate investment in operating expenses
+经营活动产生的现金流入,Cash inflow from operating activities
+经营活动产生的现金流出,Cash outflow from operating activities
+投资活动产生的现金流入,Cash inflows from investment activities
+投资活动产生的现金流出,Cash outflow from investment activities
+筹资活动产生的现金流入,Cash inflows from fundraising activities
+筹资活动产生的现金流出,Cash outflows from fundraising activities
+年份,years
+轻重工业,Light and heavy industry
+轻重工业名称,Light and heavy industrial name
+乡镇_村街门牌号,_ Village Street town house number
+no,No
+lon_bd09,lon_bd09
+lat_bd09,Lat_bd09
+dens_1,Dens_1
+dens_4,Dens_4
+dens_10,Dens_10
+year,Year
+sq,Sq
+frdm_year,Frdm_year
+frdm,Frdm
+sic4,Sic4
+tfp_acf_tl,Tfp_acf_tl
+tfp_acf_cd,tfp_acf_cd
+prefecture_4,prefecture_4
+prefecture_merge,prefecture_merge
+prefecture,Prefecture
+prefecture_old,Prefecture_old
+inter_sum_area,Inter_sum_area
+prefecture_old_merge,Defect_old_merge
+N,N
+province,Province
+capitalcity,Capitalcity
+proj_pop1820,Proj_pop1820
+proj_pop1953,Proj_pop1953
+proj_pop1776,Proj_pop1776
+pref_X_coor,pref_X_coor
+pref_Y_coor,pref_Y_coor
+proj_pop_dens1820,Proj_pop_dens1820
+proj_pop_dens1776,Proj_pop_dens1776
+proj_pop_dens1953,Proj_pop_dens1953
+prefecture_6,Prefecture_6
+name_ref,Name_ref
+area,Area
+count,Count
+prefecture_2,Prefecture_2
+merge_pop,Merge_pop
+dis,Dis
