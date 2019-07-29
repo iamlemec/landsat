@@ -2,7 +2,8 @@ census = {}
 
 census[2004] = {
     'id': 'id',
-    'industry': 'industry',
+    'industry': 'sic4',
+    'location_code': 'location_code',
     'income': 'income',
     'total_assets': 'assets',
     'employees': 'employees'
