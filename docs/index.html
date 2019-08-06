@@ -265,11 +265,20 @@ Firm level fields available
 
 ---
 
+## Coordinate Correction
+
+Coordinates reported by Baidu are "fuzzed" to prevent exact geolocation, but this can be inverted
+
+![Density Overlay](images/bd_wgs_compare.svg) <!-- .element class="full" -->
+
+---
+
 ## City Structure
 
-Rich heterogeneity in how cities are laid out
+Rich heterogeneity in how cities are laid out. Notice tech cluster in southwest Xi'an.
 
 ![Density Overlay](images/density_overlay.png) <!-- .element class="full" -->
+
 
 ---
 
@@ -345,25 +354,25 @@ Only need to specify objective (categorical cross entry) and optimizer (gradient
 
 ## CNN Results
 
-Same objective as classical case (log productivity) using mean squared error as the objective and the `adam` optimizer for 25 epochs
+Same objective as classical case (log productivity) using mean squared error as the objective
 
-![CNN Results](images/cnn_results_train.png) <!-- .element class="full" -->
+![CNN Results](images/asie_tfp_medium_train.svg) <!-- .element class="full" -->
 
 ---
 
 ## CNN Validation
 
-Inspecting validation numbers reveals a sustained effect but also some overfitting
+Inspecting validation numbers reveals a sustained effect with only minor overfitting
 
-![CNN Results](images/cnn_results_valid.png) <!-- .element class="full" -->
+![CNN Results](images/asie_tfp_medium_valid.svg) <!-- .element class="full" -->
 
 ---
 
 ## Intermediate Results
 
-To bridge the gap between classical (OLS) and CNN, we can look at a simple radial model (where the radius is trained rather than fixed). This appears to have little predictive power.
+To bridge the gap between classical (OLS) and CNN, we can look at a simple radial model (where the radius is trained rather than fixed). Appears to have little predictive power.
 
-![Radial Results](images/radial_results.png) <!-- .element class="full" -->
+![Radial Results](images/asie_tfp_radial_valid.svg) <!-- .element class="full" -->
 
 ---
 
@@ -396,8 +405,17 @@ Partialling out fixed effects from industry code (4-digit) still leaves a substa
 
 ## Residual Results
 
-![Residual Results](images/resid_results_train.png)
-![Residual Results](images/resid_results_valid.png)
+Residual results about half as large, but still significant
+
+![Residual Results](images/asie_resid_medium_train.svg) <!-- .element class="full" -->
+
+---
+
+## Residual Results
+
+Similar low levels of overfitting to original results
+
+![Residual Results](images/asie_resid_medium_valid.svg) <!-- .element class="full" -->
 
 ---
 
