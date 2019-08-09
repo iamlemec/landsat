@@ -34,18 +34,6 @@ if (window.location.search.match(/print-pdf/gi)) {
 }
 </script>
 
-<style>
-.reveal .slides img[alt=sample_freqs] {
-    width: 90%;
-}
-.reveal .slides img[alt=results] {
-    width: 90%;
-}
-.reveal .slides img[alt=windows] {
-    width: 100%;
-}
-</style>
-
 <!--[if lt IE 9]>
 <script src="revealjs/lib/js/html5shiv.js"></script>
 <![endif]-->
@@ -60,18 +48,20 @@ if (window.location.search.match(/print-pdf/gi)) {
 
 <section data-markdown data-separator="^---$">
 <script type="text/template">
-# Spatial Clustering of Firms:
-# A Machine Learning Approach
+# Spatial Clustering of Firms
+## A Machine Learning Approach
 
-<br/><br/>
+<br/>
 
-##### Douglas Hanley (Pitt)
-##### Chengying Luo (Pitt → Happy Elements)
-##### Mingqin Wu (SCNU)
+### Douglas Hanley (Pitt)
+### Chengying Luo (Pitt → Happy Elements)
+### Mingqin Wu (SCNU)
 
-<br/><br/>
+<br/>
 
-### SNU Policy Forum, August 2019
+SNU Policy Forum, August 2019
+<br/>
+[doughanley.com/landsat](http://doughanley.com/landsat)
 
 ---
 
@@ -455,8 +445,6 @@ Perform same analysis using US data and compare results. Does the differential s
 
 <script>
 
-// Full list of configuration options available here:
-// https://github.com/hakimel/reveal.js#configuration
 Reveal.initialize({
   controls: false,
   progress: true,
@@ -468,17 +456,11 @@ Reveal.initialize({
 
   transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
 
-  // Parallax scrolling
-  // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
-  // parallaxBackgroundSize: '2100px 900px',
-
   math: {
-      // mathjax: 'http://cdn.mathjax.org/mathjax/latest/MathJax.js',
       mathjax: '/MathJax/MathJax.js',
       config: 'TeX-AMS_HTML-full'
   },
 
-  // Optional libraries used to extend on reveal.js
   dependencies: [
     { src: '/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
     { src: '/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
