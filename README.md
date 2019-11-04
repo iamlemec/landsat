@@ -16,7 +16,7 @@ Index which scene each firm is located in. Use `firm_scenes.py` and output to so
 
 #### Density generation
 
-Generate sparse firm density information partitioned by expanded, partially overlapping `UTM` squares. Run `generate_density.py` to store in `data/density`.
+Generate sparse firm density information partitioned by expanded, partially overlapping `UTM` squares. Run `firm_density.py` to store in `data/density`.
 
 #### Extract firm tiles
 
