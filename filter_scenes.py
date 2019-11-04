@@ -1,10 +1,10 @@
 import argparse
 import pandas as pd
 
-# python3 generate_targets.py --index=meta/google_landsat_index.csv --output=targets/google_scenes_2002.csv --lat_min=15 --lat_max=55 --lon_min=70 --lon_max=135 --date_min="2002-01-01" --date_max="2002-12-31"
-# python3 generate_targets.py --index=meta/google_landsat_index.csv --output=targets/google_scenes_2002_cloud.csv --lat_min=15 --lat_max=55 --lon_min=70 --lon_max=135 --date_min="2002-01-01" --date_max="2002-12-31" --cloud_max=20
-# python3 generate_targets.py --index=meta/google_landsat_index.csv --output=targets/google_scenes_2007_summer.csv --lat_min=15 --lat_max=55 --lon_min=70 --lon_max=135 --date_min="2002-03-01" --date_max="2002-08-31" --cloud_max=20
-# python3 generate_targets.py --index=meta/google_landsat_index.csv --output=targets/google_scenes_2002_mincloud.csv --lat_min=15 --lat_max=55 --lon_min=70 --lon_max=135 --date_min="2002-03-01" --date_max="2002-08-31"
+# python3 generate_targets.py --index=index/landsat/google_landsat_index.csv --output=index/scenes/google_scenes_2002.csv --lat_min=15 --lat_max=55 --lon_min=70 --lon_max=135 --date_min="2002-01-01" --date_max="2002-12-31"
+# python3 generate_targets.py --index=index/landsat/google_landsat_index.csv --output=index/scenes/google_scenes_2002_cloud.csv --lat_min=15 --lat_max=55 --lon_min=70 --lon_max=135 --date_min="2002-01-01" --date_max="2002-12-31" --cloud_max=20
+# python3 generate_targets.py --index=index/landsat/google_landsat_index.csv --output=index/scenes/google_scenes_2007_summer.csv --lat_min=15 --lat_max=55 --lon_min=70 --lon_max=135 --date_min="2002-03-01" --date_max="2002-08-31" --cloud_max=20
+# python3 generate_targets.py --index=index/landsat/google_landsat_index.csv --output=index/scenes/google_scenes_2002_mincloud.csv --lat_min=15 --lat_max=55 --lon_min=70 --lon_max=135 --date_min="2002-03-01" --date_max="2002-08-31"
 
 parser = argparse.ArgumentParser(description='Generate list of scenes matching certain criterion.')
 parser.add_argument('--index', type=str, help='path to full index')

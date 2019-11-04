@@ -38,10 +38,10 @@ def wgs2gcj(wgsLon, wgsLat):
     dLon = (dLon * 180.0) / (a / sqrtMagic * cos(radLat) * pi)
     gcjLat = wgsLat + dLat
     gcjLon = wgsLon + dLon
-    return (gcjLon, gcjLat)
+    return gcjLon, gcjLat
 
 def gcj2wgs(gcjLon, gcjLat):
-    g0 = (gcjLon, gcjLat)
+    g0 = gcjLon, gcjLat
     w0 = g0
     g1 = wgs2gcj(w0[0], w0[1])
     # w1 = w0 - (g1 - g0)
@@ -62,7 +62,7 @@ def gcj2bd(gcjLon, gcjLat):
     theta = atan2(gcjLat, gcjLon) + 0.000003 * cos(gcjLon * pi * 3000.0 / 180.0)
     bdLon = z * cos(theta) + 0.0065
     bdLat = z * sin(theta) + 0.006
-    return (bdLon, bdLat)
+    return bdLon, bdLat
 
 def bd2gcj(bdLon, bdLat):
     x = bdLon - 0.0065
@@ -71,7 +71,7 @@ def bd2gcj(bdLon, bdLat):
     theta = atan2(y, x) - 0.000003 * cos(x * pi * 3000.0 / 180.0)
     gcjLon = z * cos(theta)
     gcjLat = z * sin(theta)
-    return (gcjLon, gcjLat)
+    return gcjLon, gcjLat
 
 def wgs2bd(wgsLon, wgsLat):
     gcj = wgs2gcj(wgsLon, wgsLat)

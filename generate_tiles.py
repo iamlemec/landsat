@@ -21,13 +21,6 @@ def ensure_wgs(lon, lat, proj):
     else:
         raise('Unknown projection')
 
-# tuple to args
-def argify(f):
-    def f1(x):
-        y = f(*x)
-        return list(y) if type(y) is tuple else y
-    return f1
-
 # to limit directory sizes
 def store_chunk(tag, loc, ext='jpg'):
     tag = f'{tag:07d}'
@@ -40,31 +33,6 @@ def store_chunk(tag, loc, ext='jpg'):
 ##
 ## scenes
 ##
-
-# load scene index
-def load_index(index):
-    return pd.read_csv(index).dropna(subset=['PRODUCT_ID'])
-
-# find scene from wgs84 coordinates
-def find_scene(lon, lat, index, best=True):
-    if type(index) is str:
-        index = load_index(index)
-    prods = index[
-        (index['NORTH_LAT'] >= lat) &
-        (index['SOUTH_LAT'] <= lat) &
-        (index['EAST_LON' ] >= lon) &
-        (index['WEST_LON' ] <= lon)
-    ]
-    if len(prods) == 0:
-        return None
-    if best:
-        c_lon = 0.5*(prods['WEST_LON']+prods['EAST_LON'])
-        c_lat = 0.5*(prods['NORTH_LAT']+prods['SOUTH_LAT'])
-        dist = np.sqrt((c_lon-lon)**2+(c_lat-lat)**2)
-        best = prods.loc[dist.idxmin()]
-        return best['PRODUCT_ID']
-    else:
-        return prods
 
 # parse scene metadata
 def parse_mtl(fname):
@@ -91,18 +59,6 @@ def load_scene(pid, chan='B8'):
     meta = parse_mtl(f'scenes/{pid}_MTL.txt')
     image = Image.open(f'scenes/{pid}_{chan}.TIF')
     return meta, image
-
-# find scenes corresponding. data is (id, lon, lat) list
-def index_firm_scenes(firms, fout, index):
-    if type(firms) is str:
-        firms = pd.read_csv(firms, usecols=['id', 'lon_bd09', 'lat_bd09']).dropna()
-    if type(index) is str:
-        index = load_index(index)
-    scene = lambda lon, lat: find_scene(lon, lat, index)
-    firms[['lon_wgs84', 'lat_wgs84']] = firms[['lon_bd09', 'lat_bd09']].apply(argify(bd2wgs), raw=True, result_type='expand', axis=1)
-    firms['utm_zone'] = firms[['lon_wgs84', 'lat_wgs84']].apply(argify(wgs2utm), raw=True, axis=1)
-    firms['prod_id'] = firms[['lon_wgs84', 'lat_wgs84']].apply(argify(scene), raw=True, axis=1)
-    firms.to_csv(fout, index=False)
 
 ##
 ## satellite

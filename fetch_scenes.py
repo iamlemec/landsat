@@ -7,8 +7,8 @@ import pandas as pd
 import argparse
 
 parser = argparse.ArgumentParser(description='Generate list of scenes matching certain criterion.')
-parser.add_argument('--targets', type=str, help='path to target list')
-parser.add_argument('--output', type=str, default='scenes', help='directory to output to')
+parser.add_argument('scenes', type=str, help='path to scene list')
+parser.add_argument('--output', type=str, default='data/scenes', help='directory to output to')
 parser.add_argument('--wait', type=int, default=1, help='delay between file requests')
 parser.add_argument('--dryrun', action='store_true', help='just print out commands to run')
 parser.add_argument('--overwrite', action='store_true', help='always overwrite files')
@@ -18,7 +18,7 @@ fname_fmt = '{prod}_{chan}.{ext}'
 url_fmt = 'gs://gcp-public-data-landsat/LE07/01/{path:03d}/{row:03d}/{prod}/{prod}_{chan}.{ext}'
 
 fetch_list = []
-for i, targ in pd.read_csv(args.targets).dropna().iterrows():
+for i, targ in pd.read_csv(args.scenes).dropna().iterrows():
     scene, prod = targ['SCENE_ID'], targ['PRODUCT_ID']
     path, row = targ['WRS_PATH'], targ['WRS_ROW']
 
