@@ -163,22 +163,6 @@ class RadialPooling2D(keras.layers.Layer):
 
     def compute_output_shape(self, input_shape):
         return (1,)
-
-class RadialPooling2DX(keras.layers.Layer):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def build(self, input_shape):
-        self.size = self.add_weight(name='size', shape=(1,), initializer='uniform', trainable=True)
-        super().build(input_shape)
-
-    def call(self, x):
-        size1 = keras.activations.sigmoid(self.size)
-        return tf.reduce_mean(x*size1, axis=[1, 2])
-
-    def compute_output_shape(self, input_shape):
-        return (1,)
-
     
 def gen_radial_pool(K, C, P, R=128, S=5, loss='mean_squared_error', optimizer='adam'):
     input_fid = keras.layers.Input(shape=(1,), name='fid')
