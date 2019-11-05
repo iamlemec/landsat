@@ -95,19 +95,24 @@ if __name__ == '__main__':
     parser.add_argument('--sample', type=int, default=None, help='sample only N firms')
     parser.add_argument('--overwrite', action='store_true', help='clobber existing files')
     parser.add_argument('--threads', type=int, default=5, help='number of threads to use')
+    parser.add_argument('--chunksize', type=int, default=1_000, help='chunksize to overlay')
     args = parser.parse_args()
 
-    firms = pd.read_csv(args.firms, usecols=['id', 'lon_wgs84', 'lat_wgs84', 'utm_zone'])
+    firms = pd.read_csv(args.firms, usecols=['id', 'utm_zone', 'lon_wgs84', 'lat_wgs84'])
     if args.sample is not None:
         firms = firms.sample(n=args.sample)
 
-    utm_grp = firms.groupby('utm_zone')
-    utm_map = [(z, firms.loc[i]) for z, i in utm_grp.groups.items()]
+    firms = firms.sort_values(by=['utm_zone']).reset_index(drop=True)
+    firms = firms.rename_axis('row', axis=0).reset_index()
+    firms['row_group'] = firms['row'] // args.chunksize
+
+    utm_grp = firms.groupby(['utm_zone', 'row_group'])
+    utm_map = [(z, firms.loc[i]) for (z, g), i in utm_grp.groups.items()]
     print(len(utm_map))
 
     opts = {'overwrite': args.overwrite}
     def extract_func(z, f):
-        return extract_density_utm(z, f, args.density, args.output, **opts)
+        extract_density_utm(z, f, args.density, args.output, **opts)
 
     with Pool(args.threads) as pool:
         pool.starmap(extract_func, utm_map, chunksize=1)
