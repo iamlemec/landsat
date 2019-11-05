@@ -5,14 +5,27 @@ import scipy.sparse as sp
 from PIL import Image
 from pyproj import Proj
 from scipy.ndimage.filters import gaussian_filter
-from coord_transform import bd2wgs, gcj2wgs, wgs2utm
+from coord_transform import wgs2utm
+from multiprocessing import Pool
 
 # lest pillow complain
 Image.MAX_IMAGE_PIXELS = 1000000000
 
+# to limit directory sizes
+def store_chunk(loc, tag, ext='jpg', overwrite=False):
+    tag = f'{tag:07d}'
+    sub = tag[:4]
+    psub = f'{loc}/{sub}'
+    os.makedirs(psub, exist_ok=True)
+    ptag = f'{psub}/{tag}.{ext}'
+    if overwrite or not os.path.exists(ptag):
+        return ptag
+    else:
+        return None
+
 # sigma: blur in meters
 # norm: density units
-def extract_density_core(mat, px, py, rad, size=256, sigma=2, norm=300, image=True):
+def extract_density_mat(mat, px, py, rad=256, size=256, sigma=2, norm=300, image=True):
     # extract area
     den = mat[py-rad:py+rad, px-rad:px+rad].toarray()
 
@@ -34,70 +47,67 @@ def extract_density_core(mat, px, py, rad, size=256, sigma=2, norm=300, image=Tr
     else:
         return den
 
-def extract_density_tile(lon, lat, rad, density='density', size=256, sigma=25, norm=300, proj='bd-09', image=True):
-    lon, lat = ensure_wgs(lon, lat, proj)
-    utm_zone = wgs2utm(lon, lat)
+def extract_density_coords(lon, lat, density, **kwargs):
+    utm = wgs2utm(lon, lat)
     cells = pd.read_csv(f'{density}/utm_cells.csv', index_col='utm')
-    pixel, N = cells.loc[utm_zone, 'pixel'], cells.loc[utm_zone, 'N']
-    west, south, span = cells.loc[utm_zone, ['utm_west', 'utm_south', 'size']]
+    pixel, N = cells.loc[utm, 'pixel'], cells.loc[utm, 'N']
+    west, south, span = cells.loc[utm, ['utm_west', 'utm_south', 'size']]
+    proj = Proj(f'+proj=utm +zone={utm}, +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
 
-    proj = Proj(f'+proj=utm +zone={utm_zone}, +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
-    hist = pd.read_csv(f'{density}/density_utm{utm_zone}_{pixel}px.csv')
+    hist = pd.read_csv(f'{density}/density_utm{utm}_{pixel}px.csv')
     mat = sp.csr_matrix((hist['density'], (hist['pix_north'], hist['pix_east'])), shape=(N, N))
 
     x, y = proj(lon, lat)
-    fx = (x-west)/span
-    fy = (y-south)/span
+    fx, fy = (x-west)/span, (y-south)/span
     px, py = int(fx*N), int(fy*N)
 
-    psigma = sigma/pixel
-    return extract_density_core(mat, px, py, rad, size=size, sigma=psigma, norm=norm, image=image)
+    return extract_density_mat(mat, px, py, **kwargs)
 
-# firms is a (id, lon, lat) filename or dataframe. assumes WGS84 datum
-def extract_density_firm(firms, density, output, rad=[256, 1024], size=256, sigma=25, norm=300, overwrite=False, ext='jpg', log=True):
-    if type(firms) is str:
-        firms = pd.read_csv(firms)
-        firms['id'] = firms['id'].astype(np.int)
-    if type(rad) is int:
-        rad = [rad]
-
+def extract_density_utm(utm, firms, density, output, overwrite=False, ext='jpg', **kwargs):
     cells = pd.read_csv(f'{density}/utm_cells.csv', index_col='utm')
+    pixel, N = cells.loc[utm, 'pixel'], cells.loc[utm, 'N']
+    west, south, span = cells.loc[utm, ['utm_west', 'utm_south', 'size']]
+    proj = Proj(f'+proj=utm +zone={utm}, +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
 
-    firms = firms.sort_values(by=['utm_zone', 'id'])
-    utm_grp = firms.groupby('utm_zone')
-    utm_map = utm_grp.groups
-    utm_len = utm_grp.size()
-    if log: print(len(utm_map))
+    hist = pd.read_csv(f'{density}/density_utm{utm}_{pixel}px.csv')
+    mat = sp.csr_matrix((hist['density'], (hist['pix_north'], hist['pix_east'])), shape=(N, N))
 
-    for utm_zone in utm_map:
-        if log: print(f'{utm_zone}: {utm_len[utm_zone]}')
+    for _, tag, lon, lat in firms[['id', 'lon_wgs84', 'lat_wgs84']].itertuples():
+        if (fname := store_chunk(output, tag, ext=ext, overwrite=overwrite)) is None:
+            continue
 
-        pixel, N = cells.loc[utm_zone, 'pixel'], cells.loc[utm_zone, 'N']
-        west, south, span = cells.loc[utm_zone, ['utm_west', 'utm_south', 'size']]
-        proj = Proj(f'+proj=utm +zone={utm_zone}, +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
-        psigma = sigma/pixel
+        x, y = proj(lon, lat)
+        fx, fy = (x-west)/span, (y-south)/span
+        px, py = int(fx*N), int(fy*N)
 
-        hist = pd.read_csv(f'{density}/density_utm{utm_zone}_{pixel}px.csv')
-        mat = sp.csr_matrix((hist['density'], (hist['pix_north'], hist['pix_east'])), shape=(N, N))
+        im = extract_density_mat(mat, px, py, **kwargs)
+        im.save(fname)
 
-        for idx in utm_map[utm_zone]:
-            tag, lon, lat = firms.loc[idx, ['id', 'lon_wgs84', 'lat_wgs84']]
-            x, y = proj(lon, lat)
-            fx, fy = (x-west)/span, (y-south)/span
-            px, py = int(fx*N), int(fy*N)
-
-            for r in rad:
-                path = f'{output}/{r}px'
-                fname = store_chunk(tag, path, ext=ext)
-                if overwrite or not os.path.exists(fname):
-                    im = extract_density_core(mat, px, py, r, size=size, sigma=psigma, norm=norm)
-                    im.save(fname)
-
-# parallel version
-def extract_density_par(firms, rad, nproc=4, **kwargs):
+if __name__ == '__main__':
+    import argparse
     from multiprocessing import Pool
-    def func(df):
-        extract_density_firm(df, rad, **kwargs)
-    chunks = np.array_split(firms, nproc)
-    with Pool(nproc) as p:
-        p.map(func, chunks)
+
+    # parse input arguments
+    parser = argparse.ArgumentParser(description='patent application parser')
+    parser.add_argument('firms', type=str, help='firm data file')
+    parser.add_argument('density', type=str, help='path to density directory')
+    parser.add_argument('output', type=str, help='directory to output to')
+    parser.add_argument('--sample', type=int, default=None, help='sample only N firms')
+    parser.add_argument('--overwrite', action='store_true', help='clobber existing files')
+    parser.add_argument('--threads', type=int, default=5, help='number of threads to use')
+    args = parser.parse_args()
+
+    firms = pd.read_csv(args.firms, usecols=['id', 'lon_wgs84', 'lat_wgs84', 'utm_zone'])
+    if args.sample is not None:
+        firms = firms.sample(n=args.sample)
+
+    utm_grp = firms.groupby('utm_zone')
+    utm_map = [(z, firms.loc[i]) for z, i in utm_grp.groups.items()]
+    print(len(utm_map))
+
+    opts = {'overwrite': args.overwrite}
+    def extract_func(z, f):
+        return extract_density_utm(z, f, args.density, args.output, **opts)
+
+    with Pool(args.threads) as pool:
+        pool.starmap(extract_func, utm_map, chunksize=1)
