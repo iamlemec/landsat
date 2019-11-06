@@ -11,8 +11,13 @@ parser.add_argument('output', type=str, help='path to output file')
 parser.add_argument('--index', type=str, help='scene index to use')
 args = parser.parse_args()
 
-# load firm and index data
-firms = pd.read_csv(args.firms, usecols=['id', 'lon_bd09', 'lat_bd09']).dropna()
+# load firm data
+firms = pd.read_csv(args.firms, usecols=['id', 'lon_bd09', 'lat_bd09'])
+firms = firms[(firms['id'] % 1) == 0]
+firms['id'] = firms['id'].astype('Int64')
+firms = firms.dropna()
+
+# load index data
 index = pd.read_csv(args.index, usecols=['PRODUCT_ID', 'NORTH_LAT', 'SOUTH_LAT', 'EAST_LON', 'WEST_LON']).dropna()
 index = index.rename(columns={'PRODUCT_ID': 'prod_id'})
 

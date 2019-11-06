@@ -94,7 +94,7 @@ if __name__ == '__main__':
     parser.add_argument('output', type=str, help='directory to output to')
     parser.add_argument('--sample', type=int, default=None, help='sample only N firms')
     parser.add_argument('--overwrite', action='store_true', help='clobber existing files')
-    parser.add_argument('--threads', type=int, default=5, help='number of threads to use')
+    parser.add_argument('--threads', type=int, default=10, help='number of threads to use')
     parser.add_argument('--chunksize', type=int, default=1_000, help='chunksize to overlay')
     args = parser.parse_args()
 

@@ -12,7 +12,7 @@ Fetch selected scenes with `fetch_scenes.py`. Save to `data/scenes` directory.
 
 #### Firm resolution
 
-Index which scene each firm is located in. Use `firm_scenes.py` and output to something like `index/scenes/census2004_mincloud2002.csv`. This also performs the `BD-09` to `WGS-84` conversion and generates `UTM` values.
+Index which scene each firm is located in. Use `firm_scenes.py` and output to something like `index/firms/census2004_mincloud2002.csv`. This also performs the `BD-09` to `WGS-84` conversion and generates `UTM` values.
 
 #### Density generation
 
