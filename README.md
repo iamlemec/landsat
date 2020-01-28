@@ -22,6 +22,10 @@ Generate sparse firm density information partitioned by expanded, partially over
 
 Use `generate_tiles.py` to generate satellite and density tiles from firm data and store in `data/tiles/*`.
 
+#### Train algorithm
+
+Primary training code is in `notebooks/dataset.ipynb`.
+
 ### Notes
 
 Some notes on technical matters.

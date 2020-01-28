@@ -12,8 +12,8 @@ import schema
 def load_asie_firms(year, landsat):
     # load in firm and location data
     cols = schema.asie[year]
-    firms = pd.read_csv(f'../firms/asie{year}_geocode.csv', usecols=cols).rename(cols, axis=1)
-    targ = pd.read_csv(f'../index/asie{year}_{landsat}.csv', usecols=['id', 'lat_wgs84', 'lon_wgs84', 'prod_id'])
+    firms = pd.read_csv(f'../data/firms/asie{year}_geocode.csv', usecols=cols).rename(cols, axis=1)
+    targ = pd.read_csv(f'../index/firms/asie{year}_{landsat}.csv', usecols=['id', 'lat_wgs84', 'lon_wgs84', 'prod_id'])
     firms = pd.merge(firms, targ, on='id', how='left').dropna(subset=['id', 'sic4', 'prod_id', 'prefecture'])
 
     # regulate id
@@ -48,8 +48,8 @@ def load_asie_firms(year, landsat):
 def load_census_firms(year, landsat):
     # load in firm and location data
     cols = schema.census[year]
-    firms = pd.read_csv(f'../firms/census{year}_geocode.csv', usecols=cols).rename(cols, axis=1)
-    targ = pd.read_csv(f'../index/census{year}_{landsat}.csv', usecols=['id', 'lat_wgs84', 'lon_wgs84', 'prod_id'])
+    firms = pd.read_csv(f'../data/firms/census{year}_geocode.csv', usecols=cols).rename(cols, axis=1)
+    targ = pd.read_csv(f'../index/firms/census{year}_{landsat}.csv', usecols=['id', 'lat_wgs84', 'lon_wgs84', 'prod_id'])
     firms = pd.merge(firms, targ, on='id', how='left').dropna(subset=['id', 'sic4', 'prod_id', 'location_code'])
 
     # regulate id
