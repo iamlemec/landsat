@@ -136,7 +136,7 @@ def gen_avg_density(K, C, loss='mean_squared_error', optimizer='adam'):
     model = keras.Model(inputs=[input_fid, input_map], outputs=[output])
     model.compile(loss=loss, optimizer=optmizer)
     return model
-    
+
 ##
 ## variable radius pooling model
 ##
@@ -163,7 +163,7 @@ class RadialPooling2D(keras.layers.Layer):
 
     def compute_output_shape(self, input_shape):
         return (1,)
-    
+
 def gen_radial_pool(K, C, P, R=128, S=5, loss='mean_squared_error', optimizer='adam'):
     input_fid = keras.layers.Input(shape=(1,), name='fid')
     input_map = keras.layers.Input(shape=(K, K, C), name='map')

@@ -63,25 +63,36 @@ def extract_density_coords(lon, lat, density, **kwargs):
 
     return extract_density_mat(mat, px, py, **kwargs)
 
+def make_sparse_map(data, N):
+    return sp.csr_matrix((data['density'], (data['pix_north'], data['pix_east'])), shape=(N, N))
+
 def extract_density_utm(utm, firms, density, output, overwrite=False, ext='jpg', **kwargs):
     cells = pd.read_csv(f'{density}/utm_cells.csv', index_col='utm')
     pixel, N = cells.loc[utm, 'pixel'], cells.loc[utm, 'N']
     west, south, span = cells.loc[utm, ['utm_west', 'utm_south', 'size']]
     proj = Proj(f'+proj=utm +zone={utm}, +ellps=WGS84 +datum=WGS84 +units=m +no_defs')
 
-    hist = pd.read_csv(f'{density}/density_utm{utm}_{pixel}px.csv')
-    mat = sp.csr_matrix((hist['density'], (hist['pix_north'], hist['pix_east'])), shape=(N, N))
+    hist_tot = pd.read_csv(f'{density}/total_utm{utm}_{pixel}px.csv')
+    mat_tot = make_sparse_map(hist_tot, N)
+    path_tot = f'{output}/total'
 
-    for _, tag, lon, lat in firms[['id', 'lon_wgs84', 'lat_wgs84']].itertuples():
-        if (fname := store_chunk(output, tag, ext=ext, overwrite=overwrite)) is None:
-            continue
+    hist_ind = pd.read_csv(f'{density}/industry_utm{utm}_{pixel}px.csv')
+    group_ind = hist_ind.groupby('sic2').groups
+    mat_ind = {ind: make_sparse_map(hist_ind.loc[rows], N) for ind, rows in group_ind.items()}
+    path_ind = f'{output}/industry'
 
+    for _, tag, ind, lon, lat in firms[['id', 'sic2', 'lon_wgs84', 'lat_wgs84']].itertuples():
         x, y = proj(lon, lat)
         fx, fy = (x-west)/span, (y-south)/span
         px, py = int(fx*N), int(fy*N)
 
-        im = extract_density_mat(mat, px, py, **kwargs)
-        im.save(fname)
+        if (fname_tot := store_chunk(path_tot, tag, ext=ext, overwrite=overwrite)) is not None:
+            im_tot = extract_density_mat(mat_tot, px, py, **kwargs)
+            im_tot.save(fname_tot)
+
+        if (fname_ind := store_chunk(path_ind, tag, ext=ext, overwrite=overwrite)) is not None:
+            im_ind = extract_density_mat(mat_ind[ind], px, py, **kwargs)
+            im_ind.save(fname_ind)
 
 if __name__ == '__main__':
     import argparse
@@ -98,7 +109,9 @@ if __name__ == '__main__':
     parser.add_argument('--chunksize', type=int, default=1_000, help='chunksize to overlay')
     args = parser.parse_args()
 
-    firms = pd.read_csv(args.firms, usecols=['id', 'utm_zone', 'lon_wgs84', 'lat_wgs84'])
+    firms = pd.read_csv(args.firms, usecols=['id', 'sic4', 'utm_zone', 'lon_wgs84', 'lat_wgs84'])
+    firms['sic2'] = firms['sic4'] // 100
+
     if args.sample is not None:
         firms = firms.sample(n=args.sample)
 

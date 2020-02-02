@@ -12,9 +12,10 @@ parser.add_argument('--index', type=str, help='scene index to use')
 args = parser.parse_args()
 
 # load firm data
-firms = pd.read_csv(args.firms, usecols=['id', 'lon_bd09', 'lat_bd09'])
+firms = pd.read_csv(args.firms, usecols=['id', 'sic4', 'lon_bd09', 'lat_bd09'])
 firms = firms[(firms['id'] % 1) == 0]
 firms['id'] = firms['id'].astype('Int64')
+firms['sic4'] = firms['sic4'].astype('Int64')
 firms = firms.dropna()
 
 # load index data
@@ -42,7 +43,7 @@ match = pd.DataFrame({
 })
 
 # find best match scenes
-match = match.merge(firms[['id', 'lon_wgs84', 'lat_wgs84']], on='id')
+match = match.merge(firms[['id', 'sic4', 'lon_wgs84', 'lat_wgs84']], on='id')
 match = match.merge(index[['prod_id', 'cent_lon', 'cent_lat']], on='prod_id')
 match['dist'] = np.sqrt((match['cent_lon']-match['lon_wgs84'])**2+(match['cent_lat']-match['lat_wgs84'])**2)
 best = match.groupby('id')['dist'].idxmax()

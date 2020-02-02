@@ -42,7 +42,7 @@ def eval_model(y, yhat, N=10, axs=None, qmin=None, qmax=None, ymin=None, ymax=No
     ax0, ax1 = axs
     if qmin is not None: ymin = np.quantile(y, qmin)
     if qmax is not None: ymax = np.quantile(y, qmax)
-    
+
     res = pd.DataFrame({'y': y, 'yhat': yhat}).astype(np.float)
     ax0.hexbin(res['y'], res['yhat'], cmap=mpl.cm.Blues, norm=lnorm,
                gridsize=20, extent=(ymin, ymax, ymin, ymax))

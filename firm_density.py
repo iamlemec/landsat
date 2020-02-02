@@ -45,6 +45,8 @@ utm_cent['N'] = N
 # load firm data
 firms = pd.read_csv(args.data)
 firms['id'] = firms['id'].astype(np.int)
+firms['sic4'] = firms['sic4'].astype(np.int)
+firms['sic2'] = firms['sic4'] // 100
 
 # find all relevant UTM zones and make converters
 utm_zones = sorted(firms['utm_zone'].unique())
@@ -76,7 +78,10 @@ for zone, idx in firms.groupby('utm_zone').groups.items():
     df1[['pix_east', 'pix_north']] -= 1
     print(zone, len(df), len(df1))
 
-    hist = df1.groupby(['pix_east', 'pix_north']).size().rename('count').reset_index()
-    hist['density'] = hist['count']/(pixel/1e3)**2 # firms per square kilometer
-    hist.to_csv(f'{args.dense}/density_utm{zone}_{pixel}px.csv', index=False)
+    hist1 = df1.groupby(['pix_east', 'pix_north']).size().rename('count').reset_index()
+    hist1['density'] = hist1['count']/(pixel/1e3)**2 # firms per square kilometer
+    hist1.to_csv(f'{args.dense}/total_utm{zone}_{pixel}px.csv', index=False)
 
+    hist2 = df1.groupby(['sic2', 'pix_east', 'pix_north']).size().rename('count').reset_index()
+    hist2['density'] = hist2['count']/(pixel/1e3)**2 # firms per square kilometer
+    hist2.to_csv(f'{args.dense}/industry_utm{zone}_{pixel}px.csv', index=False)

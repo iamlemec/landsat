@@ -18,6 +18,8 @@ Index which scene each firm is located in. Use `firm_scenes.py` and output to so
 
 Generate sparse firm density information partitioned by expanded, partially overlapping `UTM` squares. Run `firm_density.py` to store in `data/density`.
 
+TODO: construct upstream, downstream, and within measures.
+
 #### Extract firm tiles
 
 Use `generate_tiles.py` to generate satellite and density tiles from firm data and store in `data/tiles/*`.
