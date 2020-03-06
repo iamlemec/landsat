@@ -1,15 +1,9 @@
 #!/usr/bin/env python
 
-import os
-from glob import glob
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from tensorflow import keras
-from PIL import Image
-import mectools.data as dt
 import sklearn.model_selection as sk
-import statsmodels.formula.api as smf
 
 import train_data as data
 import train_tools as tools

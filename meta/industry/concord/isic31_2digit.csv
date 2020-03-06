@@ -1,0 +1,63 @@
+isic31,sector,description
+1,1,"Agriculture, hunting and related service activities"
+2,1,"Forestry, logging and related service activities"
+5,1,"Fishing, aquaculture and service activities incidental to fishing"
+10,2,Mining of coal and lignite; extraction of peat
+11,3,"Extraction of crude petroleum and natural gas; service activities incidental to oil and gas extraction, excluding surveying"
+12,4,Mining of uranium and thorium ores
+13,4,Mining of metal ores
+14,5,Other mining and quarrying
+15,6,Manufacture of food products and beverages
+16,6,Manufacture of tobacco products
+17,7,Manufacture of textiles
+18,8,Manufacture of wearing apparel; dressing and dyeing of fur
+19,8,"Tanning and dressing of leather; manufacture of luggage, handbags, saddlery, harness and footwear"
+20,9,"Manufacture of wood and of products of wood and cork, except furniture; manufacture of articles of straw and plaiting materials"
+21,10,Manufacture of paper and paper products
+22,10,"Publishing, printing and reproduction of recorded media"
+23,11,"Manufacture of coke, refined petroleum products and nuclear fuel"
+24,12,Manufacture of chemicals and chemical products
+25,21,Manufacture of rubber and plastics products
+26,13,Manufacture of other non-metallic mineral products
+27,14,Manufacture of basic metals
+28,15,"Manufacture of fabricated metal products, except machinery and equipment"
+29,16,Manufacture of machinery and equipment n.e.c.
+30,19,"Manufacture of office, accounting and computing machinery"
+31,18,Manufacture of electrical machinery and apparatus n.e.c.
+32,19,"Manufacture of radio, television and communication equipment and apparatus"
+33,21,"Manufacture of medical, precision and optical instruments, watches and clocks"
+34,17,"Manufacture of motor vehicles, trailers and semi-trailers"
+35,17,Manufacture of other transport equipment
+36,9,Manufacture of furniture; manufacturing n.e.c.
+37,22,Recycling
+40,23,"Electricity, gas, steam and hot water supply"
+41,25,"Collection, purification and distribution of water"
+45,26,Construction
+50,30,"Sale, maintenance and repair of motor vehicles and motorcycles; retail sale of automotive fuel"
+51,30,"Wholesale trade and commission trade, except of motor vehicles and motorcycles"
+52,30,"Retail trade, except of motor vehicles and motorcycles; repair of personal and household goods"
+55,31,Hotels and restaurants
+60,27,Land transport; transport via pipelines
+61,27,Water transport
+62,27,Air transport
+63,27,Supporting and auxiliary transport activities; activities of travel agencies
+64,28,Post and telecommunications
+65,32,"Financial intermediation, except insurance and pension funding"
+66,32,"Insurance and pension funding, except compulsory social security"
+67,32,Activities auxiliary to financial intermediation
+70,33,Real estate activities
+71,34,Renting of machinery and equipment without operator and of personal and household goods
+72,29,Computer and related activities
+73,36,Research and development
+74,34,Other business activities
+75,38,Public administration and defence; compulsory social security
+80,39,Education
+85,40,Health and social work
+90,38,"Sewage and refuse disposal, sanitation and similar activities"
+91,42,Activities of membership organizations n.e.c.
+92,41,"Recreational, cultural and sporting activities"
+93,,Other service activities production activities of private households
+95,,Activities of private households as employers of domestic staff
+96,,Undifferentiated goods-producing activities of private households for own use
+97,,Undifferentiated service-producing activities of private households for own use
+99,,Extraterritorial organizations and bodies
