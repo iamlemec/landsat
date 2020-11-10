@@ -47,6 +47,7 @@ def extract_density_mat(mat, px, py, rad=256, size=256, sigma=2, norm=300, image
     else:
         return den
 
+# this expects WGS84 coordinates
 def extract_density_coords(lon, lat, density, **kwargs):
     utm = wgs2utm(lon, lat)
     cells = pd.read_csv(f'{density}/utm_cells.csv', index_col='utm')

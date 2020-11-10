@@ -54,10 +54,31 @@ def parse_mtl(fname):
 
     return meta
 
+# find scene from wgs84 coordinates
+def find_scene(lon, lat, index, best=True):
+    if type(index) is str:
+        index = load_index(index)
+    prods = index[
+        (index['NORTH_LAT'] >= lat) &
+        (index['SOUTH_LAT'] <= lat) &
+        (index['EAST_LON' ] >= lon) &
+        (index['WEST_LON' ] <= lon)
+    ]
+    if len(prods) == 0:
+        return None
+    if best:
+        c_lon = 0.5*(prods['WEST_LON']+prods['EAST_LON'])
+        c_lat = 0.5*(prods['NORTH_LAT']+prods['SOUTH_LAT'])
+        dist = np.sqrt((c_lon-lon)**2+(c_lat-lat)**2)
+        best = prods.loc[dist.idxmin()]
+        return best['PRODUCT_ID']
+    else:
+        return prods
+
 # load scene imagery and metadata
 def load_scene(pid, chan='B8'):
-    meta = parse_mtl(f'scenes/{pid}_MTL.txt')
-    image = Image.open(f'scenes/{pid}_{chan}.TIF')
+    meta = parse_mtl(f'data/scenes/{pid}_MTL.txt')
+    image = Image.open(f'data/scenes/{pid}_{chan}.TIF')
     return meta, image
 
 ##
@@ -77,6 +98,7 @@ def extract_satelite_core(lon, lat, meta, image, rad=512):
     sx, sy = image.size
     px, py = int(fx*sx), int((1-fy)*sy) # image origin is top-left
     box = (px-rad, py-rad, px+rad, py+rad)
+    print(box)
     im = image.crop(box)
 
     return im
