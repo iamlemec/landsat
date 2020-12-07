@@ -77,8 +77,8 @@ def find_scene(lon, lat, index, best=True):
 
 # load scene imagery and metadata
 def load_scene(pid, chan='B8'):
-    meta = parse_mtl(f'data/scenes/{pid}_MTL.txt')
-    image = Image.open(f'data/scenes/{pid}_{chan}.TIF')
+    meta = parse_mtl(f'../data/scenes/{pid}_MTL.txt')
+    image = Image.open(f'../data/scenes/{pid}_{chan}.TIF')
     return meta, image
 
 ##
@@ -98,7 +98,6 @@ def extract_satelite_core(lon, lat, meta, image, rad=512):
     sx, sy = image.size
     px, py = int(fx*sx), int((1-fy)*sy) # image origin is top-left
     box = (px-rad, py-rad, px+rad, py+rad)
-    print(box)
     im = image.crop(box)
 
     return im

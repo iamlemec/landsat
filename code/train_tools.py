@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 import matplotlib as mpl
 import sklearn.model_selection as sk
 from scipy.interpolate import InterpolatedUnivariateSpline
@@ -50,7 +49,7 @@ def eval_model(y, yhat, N=10, axs=None, qmin=None, qmax=None, ymin=None, ymax=No
     bins = np.linspace(ymin, ymax, N)
     res['ybin'] = np.digitize(res['y'], bins)
     res['ybin'] = np.minimum(N-1, res['ybin'])
-    bmean = res.groupby('ybin')['yhat'].agg({'mean': np.mean, 'var': np.std, 'size': len})
+    bmean = res.groupby('ybin')['yhat'].agg(mean=np.mean, var=np.std, size=len)
     bmean['std'] = bmean['var']/np.sqrt(bmean['size'])
     bmean = bmean.reindex(np.arange(N))
     bmean.index = bins

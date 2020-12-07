@@ -11,18 +11,18 @@ import train_schema as schema
 ## firm loading
 ##
 
-def load_asie_firms(year, landsat):
+def load_asie_firms(year, landsat, drop=True):
     # load in firm and location data
     cols = schema.asie[year]
-    firms = pd.read_csv(f'data/firms/asie{year}_geocode.csv', usecols=cols).rename(cols, axis=1)
-    targ = pd.read_csv(f'index/firms/asie{year}_{landsat}.csv', usecols=['id', 'lat_wgs84', 'lon_wgs84', 'prod_id'])
+    firms = pd.read_csv(f'../data/firms/asie{year}_geocode.csv', usecols=cols).rename(cols, axis=1)
+    targ = pd.read_csv(f'../index/firms/asie{year}_{landsat}.csv', usecols=['id', 'lat_wgs84', 'lon_wgs84', 'prod_id'])
     firms = pd.merge(firms, targ, on='id', how='left').dropna(subset=['id', 'sic4', 'prod_id', 'prefecture'])
 
     # regulate id
     firms['id'] = firms['id'].astype(np.int)
     firms['sic4'] = firms['sic4'].astype(np.int)
     firms = firms.drop_duplicates(subset='id').set_index('id', drop=False)
-
+    
     # geographic location
     firms['prefecture'] = pd.to_numeric(firms['prefecture'], errors='coerce').astype(np.int)
     firms['city'] = firms['prefecture'].apply(lambda x: int(str(x)[:3]))
@@ -39,7 +39,8 @@ def load_asie_firms(year, landsat):
         firms[f'log_{c}'] = dt.log(firms[c])
 
     # filter out bad ones
-    firms = firms.dropna(subset=['log_value_added', 'log_assets_fixed', 'log_wages'])
+    if drop:
+        firms = firms.dropna(subset=['log_value_added', 'log_assets_fixed', 'log_wages'])
 
     # compute tfp as residual
     firms['log_tfp'] = smf.ols('log_value_added ~ log_assets_fixed + log_wages', data=firms).fit().resid
@@ -82,7 +83,7 @@ def load_census_firms(year, landsat):
     firms['log_prod_resid'] = smf.ols('log_prod ~ C(sic2)', data=firms).fit().resid
 
     return firms
-    
+
 ##
 ## image loading
 ##
